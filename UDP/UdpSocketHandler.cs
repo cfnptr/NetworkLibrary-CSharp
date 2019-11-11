@@ -23,7 +23,7 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
     /// <summary>
     /// User datagram protocol IPv4 socket handler class
     /// </summary>
-    public class UdpSocketHandler
+    public abstract class UdpSocketHandler : IUdpSocketHandler
     {
         /// <summary>
         /// Maximal UDP datagram/packet size
@@ -41,31 +41,9 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
         protected Thread receiveThread;
 
         /// <summary>
-        /// UDP socket handler event listener
-        /// </summary>
-        protected IUdpSocketListener listener;
-
-        /// <summary>
         /// Is UDP socket handler threads still running
         /// </summary>
         public bool IsRunning { get; private set; }
-
-        /// <summary>
-        /// UDP socket handler event listener
-        /// </summary>
-        public IUdpSocketListener Listener
-        {
-            get { return listener; }
-            set { listener = value ?? throw new ArgumentNullException(nameof(value)); }
-        }
-
-        /// <summary>
-        /// Creates a new UDP socket handler instance
-        /// </summary>
-        public UdpSocketHandler(IUdpSocketListener listener)
-        {
-            Listener = listener;
-        }
 
         /// <summary>
         /// Creates and binds UDP socket handler instance, starts receive thread
@@ -100,7 +78,7 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
                 }
                 catch(Exception exception)
                 {
-                    listener.OnCloseException(exception);
+                    OnCloseException(exception);
                 }
 
                 socket = null;
@@ -115,7 +93,7 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
                 }
                 catch (Exception exception)
                 {
-                    listener.OnCloseException(exception);
+                    OnCloseException(exception);
                 }
 
                 receiveThread = null;
@@ -167,17 +145,34 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
                     Buffer.BlockCopy(buffer, 0, data, 0, count);
 
                     var datagram = new Datagram(data, (IPEndPoint)endPoint);
-                    listener.OnDatagramReceive(datagram);
+                    OnDatagramReceive(datagram);
                 }
                 catch (SocketException socketExceotion)
                 {
-                    listener.OnReceiveThreadSocketException(socketExceotion);
+                    OnReceiveThreadSocketException(socketExceotion);
                 }
                 catch (Exception exception)
                 {
-                    listener.OnReceiveThreadException(exception);
+                    OnReceiveThreadException(exception);
                 }
             }
         }
+
+        /// <summary>
+        /// On UDP socket handler datagram receive
+        /// </summary>
+        protected abstract void OnDatagramReceive(Datagram datagram);
+        /// <summary>
+        /// On UDP socket handler close exception
+        /// </summary>
+        protected abstract void OnCloseException(Exception exception);
+        /// <summary>
+        /// On UDP socket handler receive thread exception
+        /// </summary>
+        protected abstract void OnReceiveThreadException(Exception exception);
+        /// <summary>
+        /// On UDP socket handler receive thread socket exception
+        /// </summary>
+        protected abstract void OnReceiveThreadSocketException(SocketException socketException);
     }
 }

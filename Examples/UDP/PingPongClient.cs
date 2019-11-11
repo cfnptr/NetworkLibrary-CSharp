@@ -23,7 +23,7 @@ namespace QuantumBranch.OpenNetworkLibrary.Examples.UDP
 	/// <summary>
     /// Ping pong UDP client class
     /// </summary>
-    public class PingPongClient : IUdpSocketListener
+    public class PingPongClient : UdpSocketHandler
     {
         /// <summary>
         /// Client UDP socket handler
@@ -39,7 +39,6 @@ namespace QuantumBranch.OpenNetworkLibrary.Examples.UDP
         /// </summary>
         public PingPongClient(IPEndPoint serverEndPoint)
         {
-            socketHandler = new UdpSocketHandler(this);
             this.serverEndPoint = serverEndPoint;
 
             var localEndPoint = new IPEndPoint(IPAddress.Any, IPEndPoint.MinPort);
@@ -49,7 +48,7 @@ namespace QuantumBranch.OpenNetworkLibrary.Examples.UDP
         /// <summary>
         /// On UDP socket handler datagram receive
         /// </summary>
-        public void OnDatagramReceive(Datagram datagram)
+        protected override void OnDatagramReceive(Datagram datagram)
         {
             if (!serverEndPoint.Equals(datagram.ipEndPoint))
             {
@@ -88,7 +87,7 @@ namespace QuantumBranch.OpenNetworkLibrary.Examples.UDP
         /// <summary>
         /// On UDP socket handler close exception
         /// </summary>
-        public void OnCloseException(Exception exception)
+        protected override void OnCloseException(Exception exception)
         {
             Console.WriteLine($"Failed to close example server UDP socket handler, {exception}");
             throw exception;
@@ -96,7 +95,7 @@ namespace QuantumBranch.OpenNetworkLibrary.Examples.UDP
         /// <summary>
         /// On UDP socket handler receive thread exception
         /// </summary>
-        public void OnReceiveThreadException(Exception exception)
+        protected override void OnReceiveThreadException(Exception exception)
         {
             Console.WriteLine($"Fatal server receive thread exception, {exception}");
             throw exception;
@@ -104,7 +103,7 @@ namespace QuantumBranch.OpenNetworkLibrary.Examples.UDP
         /// <summary>
         /// On UDP socket handler receive thread socket exception
         /// </summary>
-        public void OnReceiveThreadSocketException(SocketException socketException)
+        protected override void OnReceiveThreadSocketException(SocketException socketException)
         {
             Console.WriteLine("Ignored receive thread socket exception");
         }

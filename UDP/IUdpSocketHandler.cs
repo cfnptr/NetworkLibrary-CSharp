@@ -26,10 +26,6 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
         /// Is UDP socket handler threads still running
         /// </summary>
         bool IsRunning { get; }
-        /// <summary>
-        /// UDP socket handler event listener
-        /// </summary>
-        IUdpSocketListener Listener { get; set; }
 
         /// <summary>
         /// Creates and binds UDP socket handler instance, starts receive thread
