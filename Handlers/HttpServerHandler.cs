@@ -48,12 +48,21 @@ namespace QuantumBranch.OpenNetworkLibrary
         /// </summary>
         public HttpServerHandler()
         {
+            listener = new HttpListener();
+            requestThread = new Thread(RequestThreadLogic) { IsBackground = true, };
+        }
+
+        /// <summary>
+        /// Starts HTTP server listener and receive thread
+        /// </summary>
+        public void Start()
+        {
+            if (isRunning)
+                return;
+
             isRunning = true;
 
-            listener = new HttpListener();
             listener.Start();
-
-            requestThread = new Thread(RequestThreadLogic) { IsBackground = true, };
             requestThread.Start();
         }
 

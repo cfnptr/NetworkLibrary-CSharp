@@ -52,24 +52,8 @@ namespace QuantumBranch.OpenNetworkLibrary
         void Trace(object message);
 
         /// <summary>
-        /// Logs a new message with the prefix at fatal log level
+        /// Closes logger stream
         /// </summary>
-        void Fatal(object message, object prefix);
-        /// <summary>
-        /// Logs a new message with the prefix at error log level
-        /// </summary>
-        void Error(object message, object prefix);
-        /// <summary>
-        /// Logs a new message with the prefix at info log level
-        /// </summary>
-        void Info(object message, object prefix);
-        /// <summary>
-        /// Logs a new message with the prefix at fatal log level
-        /// </summary>
-        void Debug(object message, object prefix);
-        /// <summary>
-        /// Logs a new message with the prefix at fatal log level
-        /// </summary>
-        void Trace(object message, object prefix);
+        void Close();
     }
 }

@@ -164,6 +164,6 @@ namespace QuantumBranch.OpenNetworkLibrary
         /// <summary>
         /// On UDP socket handler receive thread socket exception
         /// </summary>
-        protected abstract void OnReceiveThreadSocketException(SocketException socketException);
+        protected abstract void OnReceiveThreadSocketException(SocketException exception);
     }
 }

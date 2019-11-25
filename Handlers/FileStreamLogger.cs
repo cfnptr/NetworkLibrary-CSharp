@@ -45,56 +45,44 @@ namespace QuantumBranch.OpenNetworkLibrary
             if (!Directory.Exists(logFolderPath))
                 Directory.CreateDirectory(logFolderPath);
 
-            var filePath = logFolderPath + DateTime.Now.ToString("yyyy-M-dd-HH-mm-ss");
+            var filePath = logFolderPath + DateTime.Now.ToString("yyyy-M-dd_HH-mm-ss");
             stream = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write);
         }
 
         /// <summary>
         /// Returns true if logger should log this level
         /// </summary>
-        public bool Log(LogType level) { return Level <= level; }
+        public bool Log(LogType level) { return level <= Level; }
 
         /// <summary>
         /// Logs a new message at fatal log level
         /// </summary>
-        public void Fatal(object message) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [Fatal]: {message}"); }
+        public void Fatal(object message) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [Fatal]: {message}\n"); }
         /// <summary>
         /// Logs a new message at error log level
         /// </summary>
-        public void Error(object message) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [Error]: {message}"); }
+        public void Error(object message) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [Error]: {message}\n"); }
         /// <summary>
         /// Logs a new message at info log level
         /// </summary>
-        public void Info(object message) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [Info]: {message}"); }
+        public void Info(object message) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [Info]: {message}\n"); }
         /// <summary>
         /// Logs a new message at fatal log level
         /// </summary>
-        public void Debug(object message) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [Debug]: {message}"); }
+        public void Debug(object message) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [Debug]: {message}\n"); }
         /// <summary>
         /// Logs a new message at fatal log level
         /// </summary>
-        public void Trace(object message) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [Trace]: {message}"); }
+        public void Trace(object message) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [Trace]: {message}\n"); }
 
         /// <summary>
-        /// Logs a new message with the prefix at fatal log level
+        /// Closes logger stream
         /// </summary>
-        public void Fatal(object message, object prefix) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [{prefix}] [Fatal]: {message}"); }
-        /// <summary>
-        /// Logs a new message with the prefix at error log level
-        /// </summary>
-        public void Error(object message, object prefix) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [{prefix}] [Error]: {message}"); }
-        /// <summary>
-        /// Logs a new message with the prefix at info log level
-        /// </summary>
-        public void Info(object message, object prefix) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [{prefix}] [Info]: {message}"); }
-        /// <summary>
-        /// Logs a new message with the prefix at fatal log level
-        /// </summary>
-        public void Debug(object message, object prefix) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [{prefix}] [Debug]: {message}"); }
-        /// <summary>
-        /// Logs a new message with the prefix at fatal log level
-        /// </summary>
-        public void Trace(object message, object prefix) { WriteToStream($"[{DateTime.Now.ToLongTimeString()}] [{Thread.CurrentThread.ManagedThreadId}] [{prefix}] [Trace]: {message}"); }
+        public void Close()
+        {
+            lock (stream)
+                stream.Close();
+        }
 
         /// <summary>
         /// Writes logger message to the file stream
