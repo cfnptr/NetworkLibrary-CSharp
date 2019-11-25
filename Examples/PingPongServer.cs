@@ -16,9 +16,9 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using QuantumBranch.OpenNetworkLibrary.UDP;
+using QuantumBranch.OpenNetworkLibrary;
 
-namespace QuantumBranch.OpenNetworkLibrary.Examples.UDP
+namespace QuantumBranch.OpenNetworkLibrary.Examples
 {
 	/// <summary>
     /// Ping pong UDP server class
@@ -33,11 +33,7 @@ namespace QuantumBranch.OpenNetworkLibrary.Examples.UDP
         /// <summary>
         /// Creates a new ping pong server instance
         /// </summary>
-        public PingPongServer()
-        {
-            var localEndPoint = new IPEndPoint(IPAddress.Any, IPEndPoint.MinPort);
-            socketHandler.Bind(localEndPoint);
-        }
+        public PingPongServer() : base(new IPEndPoint(IPAddress.Any, IPEndPoint.MinPort)) { }
 
         /// <summary>
         /// On UDP socket handler datagram receive

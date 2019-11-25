@@ -1,4 +1,4 @@
-
+﻿
 // Copyright 2019 Nikita Fediuchin (QuantumBranch)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace QuantumBranch.OpenNetworkLibrary.Examples.UDP
+namespace QuantumBranch.OpenNetworkLibrary
 {
-	public enum DatagramType : byte
-	{
-    	Ping,
-    	Pong,
-	}
+    /// <summary>
+    /// Time tick handler interface
+    /// </summary>
+    public interface ITimeTickHandler
+    {
+        /// <summary>
+        /// Time tick value
+        /// </summary>
+        long Tick { get; }
+    }
 }

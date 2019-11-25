@@ -13,10 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Net;
 
-namespace QuantumBranch.OpenNetworkLibrary.UDP
+namespace QuantumBranch.OpenNetworkLibrary
 {
     /// <summary>
     /// Datagram container structure
@@ -26,11 +25,15 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
         /// <summary>
         /// Datagram header byte size in the data array
         /// </summary>
-        public const int HeaderByteSize = 1;
+        public const int HeaderByteSize = 2;
         /// <summary>
-        /// Datagram header index value in the data array
+        /// Index of the type value in the datagram data array
         /// </summary>
-        public const int HeaderArrayIndex = 0;
+        public const int HeaderTypeIndex = 0;
+        /// <summary>
+        ///  Index of the number value in the datagram data array
+        /// </summary>
+        public const int HeaderNumberIndex = 1;
 
         /// <summary>
         /// Datagram data byte array
@@ -45,13 +48,22 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
         /// Returns datagram data byte array length
         /// </summary>
         public int Length => data.Length;
+
         /// <summary>
         /// Datagram first data array byte value
         /// </summary>
         public byte Type
         {
-            get { return data[HeaderArrayIndex]; }
-            set { data[HeaderArrayIndex] = value; }
+            get { return data[HeaderTypeIndex]; }
+            set { data[HeaderTypeIndex] = value; }
+        }
+        /// <summary>
+        /// Datagram second data array byte value
+        /// </summary>
+        public byte Number
+        {
+            get { return data[HeaderNumberIndex]; }
+            set { data[HeaderNumberIndex] = value; }
         }
 
         /// <summary>
@@ -62,17 +74,22 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
             this.data = data;
             this.ipEndPoint = ipEndPoint;
         }
-        /// <summary>
-        /// Creates a new datagram structure instance (appends type byte to the byte array)
-        /// </summary>
-        public Datagram(byte[] array, byte type, IPEndPoint ipEndPoint)
-        {
-            var data = new byte[array.Length + HeaderByteSize];
-            Buffer.BlockCopy(array, 0, data, HeaderByteSize, array.Length);
-            data[HeaderArrayIndex] = type;
 
-            this.data = data;
-            this.ipEndPoint = ipEndPoint;
+        /// <summary>
+        /// Sets header values to the datagram data array
+        /// </summary>
+        public void SetHeader(byte type, byte number)
+        {
+            SetHeader(data, type, number);
+        }
+
+        /// <summary>
+        /// Sets header values to the data array
+        /// </summary>
+        public static void SetHeader(byte[] data, byte type, byte number)
+        {
+            data[HeaderTypeIndex] = type;
+            data[HeaderNumberIndex] = number;
         }
     }
 }

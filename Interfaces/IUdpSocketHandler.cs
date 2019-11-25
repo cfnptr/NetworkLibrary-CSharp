@@ -15,7 +15,7 @@
 
 using System.Net;
 
-namespace QuantumBranch.OpenNetworkLibrary.UDP
+namespace QuantumBranch.OpenNetworkLibrary
 {
     /// <summary>
     /// User datagram protocol IPv4 socket handler interface
@@ -27,10 +27,6 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
         /// </summary>
         bool IsRunning { get; }
 
-        /// <summary>
-        /// Creates and binds UDP socket handler instance, starts receive thread
-        /// </summary>
-        void Bind(IPEndPoint localEndPoint);
         /// <summary>
         /// Closes UDP socket handler socket and stops receive thread
         /// </summary>

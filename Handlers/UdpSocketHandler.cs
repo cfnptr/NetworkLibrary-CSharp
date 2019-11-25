@@ -18,7 +18,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace QuantumBranch.OpenNetworkLibrary.UDP
+namespace QuantumBranch.OpenNetworkLibrary
 {
     /// <summary>
     /// User datagram protocol IPv4 socket handler class
@@ -33,33 +33,34 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
         /// <summary>
         /// UDP socket handler receive socket
         /// </summary>
-        protected Socket socket;
-
+        protected readonly Socket socket;
         /// <summary>
         /// UDP socket handler receive thread
         /// </summary>
-        protected Thread receiveThread;
+        protected readonly Thread receiveThread;
 
         /// <summary>
         /// Is UDP socket handler threads still running
         /// </summary>
-        public bool IsRunning { get; private set; }
+        protected bool isRunning;
 
         /// <summary>
-        /// Creates and binds UDP socket handler instance, starts receive thread
+        /// Is UDP socket handler threads still running
         /// </summary>
-        public void Bind(IPEndPoint localEndPoint)
+        public bool IsRunning => isRunning;
+
+        /// <summary>
+        /// Creates a new UDP socket handler class instance
+        /// </summary>
+        public UdpSocketHandler(IPEndPoint localEndPoint)
         {
-            if (IsRunning)
-                throw new InvalidOperationException("UDP socket handler already running");
+            isRunning = true;
 
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.Bind(localEndPoint);
 
             receiveThread = new Thread(ReceiveThreadLogic) { IsBackground = true, };
             receiveThread.Start();
-
-            IsRunning = true;
         }
 
         /// <summary>
@@ -67,39 +68,29 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
         /// </summary>
         public void Close()
         {
-            if (!IsRunning)
-                throw new InvalidOperationException("UDP socket handler is not running");
+            if (!isRunning)
+                return;
 
-            if (socket != null)
+            isRunning = false;
+
+            try
             {
-                try
-                {
-                    socket.Close();
-                }
-                catch(Exception exception)
-                {
-                    OnCloseException(exception);
-                }
-
-                socket = null;
+                socket.Close();
+            }
+            catch (Exception exception)
+            {
+                OnCloseException(exception);
             }
 
-            if (receiveThread != null)
+            try
             {
-                try
-                {
-                    if (receiveThread != Thread.CurrentThread)
-                        receiveThread.Join();
-                }
-                catch (Exception exception)
-                {
-                    OnCloseException(exception);
-                }
-
-                receiveThread = null;
+                if (receiveThread != Thread.CurrentThread)
+                    receiveThread.Join();
             }
-
-            IsRunning = false;
+            catch (Exception exception)
+            {
+                OnCloseException(exception);
+            }
         }
 
         /// <summary>
@@ -131,14 +122,14 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
         {
             var buffer = new byte[MaxUdpSize];
 
-            while (IsRunning)
+            while (isRunning)
             {
                 try
                 {
                     EndPoint endPoint = new IPEndPoint(IPAddress.Any, IPEndPoint.MinPort);
                     var count = socket.ReceiveFrom(buffer, 0, MaxUdpSize, SocketFlags.None, ref endPoint);
 
-                    if (count <= 0)
+                    if (count < Datagram.HeaderByteSize)
                         continue;
 
                     var data = new byte[count];
@@ -147,9 +138,9 @@ namespace QuantumBranch.OpenNetworkLibrary.UDP
                     var datagram = new Datagram(data, (IPEndPoint)endPoint);
                     OnDatagramReceive(datagram);
                 }
-                catch (SocketException socketExceotion)
+                catch (SocketException exception)
                 {
-                    OnReceiveThreadSocketException(socketExceotion);
+                    OnReceiveThreadSocketException(exception);
                 }
                 catch (Exception exception)
                 {
