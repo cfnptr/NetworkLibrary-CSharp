@@ -15,7 +15,7 @@
 
 using System.Net;
 
-namespace QuantumBranch.OpenNetworkLibrary
+namespace OpenNetworkLibrary
 {
     /// <summary>
     /// User datagram protocol IPv4 socket handler interface

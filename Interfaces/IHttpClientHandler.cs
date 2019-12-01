@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace QuantumBranch.OpenNetworkLibrary
+namespace OpenNetworkLibrary
 {
     /// <summary>
     /// Hypertext transfer protocol client handler interface

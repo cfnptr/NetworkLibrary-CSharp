@@ -15,7 +15,7 @@
 
 using System.Threading;
 
-namespace QuantumBranch.OpenNetworkLibrary
+namespace OpenNetworkLibrary
 {
     /// <summary>
     /// Time tick handler class

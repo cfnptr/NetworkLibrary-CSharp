@@ -18,7 +18,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace QuantumBranch.OpenNetworkLibrary
+namespace OpenNetworkLibrary
 {
     /// <summary>
     /// User datagram protocol IPv4 socket handler class

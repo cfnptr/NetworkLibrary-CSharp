@@ -17,7 +17,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 
-namespace QuantumBranch.OpenNetworkLibrary.Examples
+namespace OpenNetworkLibrary.Examples
 {
 	/// <summary>
     /// Ping pong UDP server class

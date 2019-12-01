@@ -17,7 +17,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace QuantumBranch.OpenNetworkLibrary
+namespace OpenNetworkLibrary
 {
     /// <summary>
     /// Hypertext transfer protocol client handler class

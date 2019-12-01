@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace QuantumBranch.OpenNetworkLibrary.Examples
+namespace OpenNetworkLibrary.Examples
 {
 	public enum DatagramType : byte
 	{

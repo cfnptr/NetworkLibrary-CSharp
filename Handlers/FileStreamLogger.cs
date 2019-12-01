@@ -18,7 +18,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
-namespace QuantumBranch.OpenNetworkLibrary
+namespace OpenNetworkLibrary
 {
     /// <summary>
     /// File stream logger class
