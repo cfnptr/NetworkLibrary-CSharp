@@ -52,17 +52,24 @@ namespace QuantumBranch.OpenNetworkLibrary
         /// <summary>
         /// Creates a new UDP socket handler class instance
         /// </summary>
-        public UdpSocketHandler(IPEndPoint localEndPoint)
+        public UdpSocketHandler()
         {
-            isRunning = true;
-
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            socket.Bind(localEndPoint);
-
             receiveThread = new Thread(ReceiveThreadLogic) { IsBackground = true, };
-            receiveThread.Start();
         }
 
+        /// <summary>
+        /// Binds UDP socket and starts receive thread
+        /// </summary>
+        public void Start(IPEndPoint localEndPoint)
+        {
+            if (isRunning)
+                return;
+
+            isRunning = true;
+            socket.Bind(localEndPoint);
+            receiveThread.Start();
+        }
         /// <summary>
         /// Closes UDP socket handler socket and stops receive thread
         /// </summary>

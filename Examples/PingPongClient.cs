@@ -16,7 +16,6 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using QuantumBranch.OpenNetworkLibrary;
 
 namespace QuantumBranch.OpenNetworkLibrary.Examples
 {
@@ -37,9 +36,10 @@ namespace QuantumBranch.OpenNetworkLibrary.Examples
         /// <summary>
         /// Creates a new ping pong client instance
         /// </summary>
-        public PingPongClient(IPEndPoint serverEndPoint) : base(new IPEndPoint(IPAddress.Any, IPEndPoint.MinPort))
+        public PingPongClient(IPEndPoint serverEndPoint)
         {
             this.serverEndPoint = serverEndPoint;
+            Start(new IPEndPoint(IPAddress.Any, IPEndPoint.MinPort));
         }
 
         /// <summary>

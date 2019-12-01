@@ -13,40 +13,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net;
-
 namespace QuantumBranch.OpenNetworkLibrary
 {
     /// <summary>
-    /// User datagram protocol IPv4 socket handler interface
+    /// HTTP server response container structure
     /// </summary>
-    public interface IUdpSocketHandler
+    public struct HttpResponse
     {
         /// <summary>
-        /// Is UDP socket handler threads still running
+        /// Is response received and correct
         /// </summary>
-        bool IsRunning { get; }
+        public bool status;
+        /// <summary>
+        /// Response type strign value
+        /// </summary>
+        public string type;
+        /// <summary>
+        /// Response data strign value
+        /// </summary>
+        public string data;
 
         /// <summary>
-        /// Binds UDP socket and starts receive thread
+        /// Creates a new HTTP server response structure instance
         /// </summary>
-        void Start(IPEndPoint localEndPoint);
+        public HttpResponse(bool status, string type, string data)
+        {
+            this.status = status;
+            this.type = type;
+            this.data = data;
+        }
         /// <summary>
-        /// Closes UDP socket handler socket and stops receive thread
+        /// Creates a new HTTP server response structure instance
         /// </summary>
-        void Close();
-
-        /// <summary>
-        /// Sends datagram to the specified remote end point
-        /// </summary>
-        int Send(byte[] buffer, int offset, int count, IPEndPoint remoteEndPoint);
-        /// <summary>
-        /// Sends datagram to the specified remote end point
-        /// </summary>
-        int Send(byte[] data, IPEndPoint remoteEndPoint);
-        /// <summary>
-        /// Sends datagram to the specified remote end point
-        /// </summary>
-        int Send(Datagram datagram);
+        public HttpResponse(bool status)
+        {
+            this.status = status;
+            type = string.Empty;
+            data = string.Empty;
+        }
     }
 }

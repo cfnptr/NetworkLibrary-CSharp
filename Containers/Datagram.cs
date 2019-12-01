@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
 using System.Net;
 
 namespace QuantumBranch.OpenNetworkLibrary
@@ -25,15 +26,11 @@ namespace QuantumBranch.OpenNetworkLibrary
         /// <summary>
         /// Datagram header byte size in the data array
         /// </summary>
-        public const int HeaderByteSize = 2;
+        public const int HeaderByteSize = 1;
         /// <summary>
         /// Index of the type value in the datagram data array
         /// </summary>
         public const int HeaderTypeIndex = 0;
-        /// <summary>
-        ///  Index of the number value in the datagram data array
-        /// </summary>
-        public const int HeaderNumberIndex = 1;
 
         /// <summary>
         /// Datagram data byte array
@@ -57,14 +54,6 @@ namespace QuantumBranch.OpenNetworkLibrary
             get { return data[HeaderTypeIndex]; }
             set { data[HeaderTypeIndex] = value; }
         }
-        /// <summary>
-        /// Datagram second data array byte value
-        /// </summary>
-        public byte Number
-        {
-            get { return data[HeaderNumberIndex]; }
-            set { data[HeaderNumberIndex] = value; }
-        }
 
         /// <summary>
         /// Creates a new datagram structure instance
@@ -73,23 +62,6 @@ namespace QuantumBranch.OpenNetworkLibrary
         {
             this.data = data;
             this.ipEndPoint = ipEndPoint;
-        }
-
-        /// <summary>
-        /// Sets header values to the datagram data array
-        /// </summary>
-        public void SetHeader(byte type, byte number)
-        {
-            SetHeader(data, type, number);
-        }
-
-        /// <summary>
-        /// Sets header values to the data array
-        /// </summary>
-        public static void SetHeader(byte[] data, byte type, byte number)
-        {
-            data[HeaderTypeIndex] = type;
-            data[HeaderNumberIndex] = number;
         }
     }
 }
