@@ -29,6 +29,10 @@ namespace OpenNetworkLibrary
         /// Maximal UDP datagram/packet size
         /// </summary>
         public const int MaxUdpSize = 65536;
+        /// <summary>
+        /// Default request time out value in the milliseconds
+        /// </summary>
+        public const int RequestTimeOut = 5000;
 
         /// <summary>
         /// UDP socket handler receive socket
