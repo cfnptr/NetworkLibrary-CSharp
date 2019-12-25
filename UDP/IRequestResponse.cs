@@ -13,21 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace OpenNetworkLibrary
+namespace OpenNetworkLibrary.UDP
 {
     /// <summary>
-    /// HTTP server response interface
+    /// Request/response class interface
     /// </summary>
-    public interface IHttpResponse
+    public interface IRequestResponse
     {
         /// <summary>
-        /// HTTP server response type string value
+        /// Byte size of the datagram data array
         /// </summary>
-        string ResponseType { get; }
+        int DataByteSize { get; }
 
         /// <summary>
-        /// Returns HTTP server response body
+        /// Converts request/response class data to the datagram data
         /// </summary>
-        string ToBody();
+        byte[] ToData();
     }
 }

@@ -17,12 +17,12 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace OpenNetworkLibrary
+namespace OpenNetworkLibrary.HTTP
 {
     /// <summary>
-    /// Hypertext transfer protocol client handler class
+    /// Tasked hypertext transfer protocol client class
     /// </summary>
-    public class HttpClientHandler : HttpClient, IHttpClientHandler
+    public class TaskedHttpClient : HttpClient, ITaskedHttpClient
     {
         /// <summary>
         /// HTTP client get string request task
@@ -30,23 +30,23 @@ namespace OpenNetworkLibrary
         protected Task<string> requestTask;
 
         /// <summary>
-        /// Creates a new HTTP client handler class instance
+        /// Creates a new tasked HTTP client class instance
         /// </summary>
-        public HttpClientHandler()
+        public TaskedHttpClient()
         {
             requestTask = Task.Factory.StartNew(() => { return string.Empty; });
         }
         /// <summary>
-        /// Creates a new HTTP client handler class instance
+        /// Creates a new tasked HTTP client class instance
         /// </summary>
-        public HttpClientHandler(HttpMessageHandler handler) : base(handler)
+        public TaskedHttpClient(HttpMessageHandler handler) : base(handler)
         {
             requestTask = Task.Factory.StartNew(() => { return string.Empty; });
         }
         /// <summary>
-        /// Creates a new HTTP client handler class instance
+        /// Creates a new tasked HTTP client class instance
         /// </summary>
-        public HttpClientHandler(HttpMessageHandler handler, bool disposeHandler) : base(handler, disposeHandler)
+        public TaskedHttpClient(HttpMessageHandler handler, bool disposeHandler) : base(handler, disposeHandler)
         {
             requestTask = Task.Factory.StartNew(() => { return string.Empty; });
         }

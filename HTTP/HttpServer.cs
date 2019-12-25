@@ -13,41 +13,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using OpenSharedLibrary.Logging;
 using System;
 using System.Net;
 using System.Threading;
 
-namespace OpenNetworkLibrary
+namespace OpenNetworkLibrary.HTTP
 {
     /// <summary>
-    /// Hypertext transfer protocol server handler class
+    /// Hypertext transfer protocol server class
     /// </summary>
-    public abstract class HttpServerHandler : IHttpServerHandler
+    public abstract class HttpServer : IHttpServer
     {
         /// <summary>
-        /// HTTP server handler listener socket
+        /// HTTP server logger
+        /// </summary>
+        protected readonly ILogger logger;
+        /// <summary>
+        /// HTTP listener socket
         /// </summary>
         protected readonly HttpListener listener;
         /// <summary>
-        /// HTTP server handler request thread
+        /// HTTP request thread
         /// </summary>
         protected readonly Thread requestThread;
 
         /// <summary>
-        /// Is HTTP socket handler threads still running
+        /// Is HTTP server threads still running
         /// </summary>
-        protected bool isRunning;
+        public bool IsRunning => listener.IsListening;
 
         /// <summary>
-        /// Is HTTP server handler threads still running
+        /// Creates a new HTTP server class instance
         /// </summary>
-        public bool IsRunning => isRunning;
-
-        /// <summary>
-        /// Creates a new HTTP server handler class instance
-        /// </summary>
-        public HttpServerHandler()
+        public HttpServer(ILogger logger)
         {
+            this.logger = logger ?? throw new ArgumentNullException();
+
             listener = new HttpListener();
             requestThread = new Thread(RequestThreadLogic) { IsBackground = true, };
         }
@@ -57,28 +59,24 @@ namespace OpenNetworkLibrary
         /// </summary>
         public void Start()
         {
-            if (isRunning)
-                return;
-
-            isRunning = true;
-
             listener.Start();
             requestThread.Start();
+
+            if (logger.Log(LogType.Info))
+                logger.Info("HTTP server started");
         }
 
         /// <summary>
-        /// Closes HTTP server handler socket and stops receive thread
+        /// Closes HTTP server socket and stops receive thread
         /// </summary>
         public void Close()
         {
-            if (!isRunning)
-                return;
-
-            isRunning = false;
-
             try
             {
                 listener.Close();
+
+                if (logger.Log(LogType.Debug))
+                    logger.Debug("HTTP server listener closed");
             }
             catch (Exception exception)
             {
@@ -87,6 +85,9 @@ namespace OpenNetworkLibrary
 
             try
             {
+                if (logger.Log(LogType.Debug))
+                    logger.Debug("Waiting for HTTP server request thread...");
+
                 if (requestThread != Thread.CurrentThread)
                     requestThread.Join();
             }
@@ -94,6 +95,9 @@ namespace OpenNetworkLibrary
             {
                 OnCloseException(exception);
             }
+
+            if (logger.Log(LogType.Info))
+                logger.Info("HTTP server closed");
         }
 
         /// <summary>
@@ -101,39 +105,53 @@ namespace OpenNetworkLibrary
         /// </summary>
         protected void RequestThreadLogic()
         {
-            while (isRunning)
+            if (logger.Log(LogType.Debug))
+                logger.Debug("HTTP server request thread started");
+
+            while (listener.IsListening)
             {
                 try
                 {
                     var context = listener.GetContext();
+
+                    if (logger.Log(LogType.Trace))
+                        logger.Trace($"Received HTTP server request (remoteEndPoint: {context.Request.RemoteEndPoint}, contentLength: {context.Request.ContentLength64})");
+
                     OnRequestReceive(context);
-                }
-                catch (HttpListenerException exception)
-                {
-                    OnReceiveThreadHttpListenerException(exception);
                 }
                 catch (Exception exception)
                 {
                     OnRequestThreadException(exception);
                 }
             }
+
+            if (logger.Log(LogType.Debug))
+                logger.Debug("HTTP server request thread stopped");
         }
 
         /// <summary>
-        /// On HTTP server handler request receive
+        /// On HTTP server request thread exception
+        /// </summary>
+        protected virtual void OnRequestThreadException(Exception exception)
+        {
+            if (logger.Log(LogType.Fatal))
+                logger.Fatal($"HTTP server request thread exception: {exception}");
+
+            Close();
+        }
+
+        /// <summary>
+        /// On HTTP server close exception
+        /// </summary>
+        protected virtual void OnCloseException(Exception exception)
+        {
+            if (logger.Log(LogType.Fatal))
+                logger.Fatal($"Failed to close HTTP server: {exception}");
+        }
+
+        /// <summary>
+        /// On HTTP server request receive
         /// </summary>
         protected abstract void OnRequestReceive(HttpListenerContext context);
-        /// <summary>
-        /// On HTTP server handler close exception
-        /// </summary>
-        protected abstract void OnCloseException(Exception exception);
-        /// <summary>
-        /// On HTTP server handler request thread exception
-        /// </summary>
-        protected abstract void OnRequestThreadException(Exception exception);
-        /// <summary>
-        /// On HTTP server handler request thread listener exception
-        /// </summary>
-        protected abstract void OnReceiveThreadHttpListenerException(HttpListenerException exception);
     }
 }

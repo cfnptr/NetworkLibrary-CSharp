@@ -13,29 +13,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace OpenNetworkLibrary
+namespace OpenNetworkLibrary.HTTP
 {
     /// <summary>
-    /// Hypertext transfer protocol client handler interface
+    /// HTTP server response container structure
     /// </summary>
-    public interface IHttpClientHandler
+    public struct HttpResponse
     {
         /// <summary>
-        /// Starts a new web request task
+        /// Is response received and correct
         /// </summary>
-        void StartRequest(string requestUri);
+        public bool status;
         /// <summary>
-        /// Returns true if web request has successfully completed
+        /// Response type strign value
         /// </summary>
-        bool GetResponse(out string response);
+        public string type;
+        /// <summary>
+        /// Response data strign value
+        /// </summary>
+        public string data;
 
         /// <summary>
-        /// Returns true if web request is completed
+        /// Creates a new HTTP server response structure instance
         /// </summary>
-        bool IsRequestCompleted();
+        public HttpResponse(bool status, string type, string data)
+        {
+            this.status = status;
+            this.type = type;
+            this.data = data;
+        }
         /// <summary>
-        /// Returns true if web request is faulted
+        /// Creates a new HTTP server response structure instance
         /// </summary>
-        bool IsRequestFaulted();
+        public HttpResponse(bool status)
+        {
+            this.status = status;
+            type = string.Empty;
+            data = string.Empty;
+        }
     }
 }

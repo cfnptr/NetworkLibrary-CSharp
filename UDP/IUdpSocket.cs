@@ -13,43 +13,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace OpenNetworkLibrary
+using System.Net;
+
+namespace OpenNetworkLibrary.UDP
 {
     /// <summary>
-    /// HTTP server response container structure
+    /// User datagram protocol IPv4 socket interface
     /// </summary>
-    public struct HttpResponse
+    public interface IUdpSocket
     {
         /// <summary>
-        /// Is response received and correct
+        /// Is UDP socket threads still running
         /// </summary>
-        public bool status;
-        /// <summary>
-        /// Response type strign value
-        /// </summary>
-        public string type;
-        /// <summary>
-        /// Response data strign value
-        /// </summary>
-        public string data;
+        bool IsRunning { get; }
 
         /// <summary>
-        /// Creates a new HTTP server response structure instance
+        /// Binds UDP socket and starts receive thread
         /// </summary>
-        public HttpResponse(bool status, string type, string data)
-        {
-            this.status = status;
-            this.type = type;
-            this.data = data;
-        }
+        void Start(IPEndPoint localEndPoint);
         /// <summary>
-        /// Creates a new HTTP server response structure instance
+        /// Closes UDP socket socket and stops receive thread
         /// </summary>
-        public HttpResponse(bool status)
-        {
-            this.status = status;
-            type = string.Empty;
-            data = string.Empty;
-        }
+        void Close();
+
+        /// <summary>
+        /// Sends datagram to the specified remote end point
+        /// </summary>
+        int Send(byte[] buffer, int offset, int count, IPEndPoint remoteEndPoint);
+        /// <summary>
+        /// Sends datagram to the specified remote end point
+        /// </summary>
+        int Send(byte[] data, IPEndPoint remoteEndPoint);
+        /// <summary>
+        /// Sends datagram to the specified remote end point
+        /// </summary>
+        int Send(Datagram datagram);
     }
 }

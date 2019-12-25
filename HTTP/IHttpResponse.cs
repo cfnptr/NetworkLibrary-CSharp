@@ -1,4 +1,4 @@
-
+﻿
 // Copyright 2019 Nikita Fediuchin (QuantumBranch)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace OpenNetworkLibrary.Examples
+namespace OpenNetworkLibrary.HTTP
 {
-	public enum DatagramType : byte
-	{
-    	Ping,
-    	Pong,
-	}
+    /// <summary>
+    /// HTTP response interface
+    /// </summary>
+    public interface IHttpResponse
+    {
+        /// <summary>
+        /// HTTP response type string value
+        /// </summary>
+        string ResponseType { get; }
+
+        /// <summary>
+        /// Returns HTTP response body
+        /// </summary>
+        string ToBody();
+    }
 }

@@ -13,21 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace OpenNetworkLibrary
+namespace OpenNetworkLibrary.HTTP
 {
     /// <summary>
-    /// HTTP server request interface
+    /// Hypertext transfer protocol server interface
     /// </summary>
-    public interface IHttpRequest
+    public interface IHttpServer
     {
         /// <summary>
-        /// HTTP server request type string value
+        /// Closes HTTP server socket and stops receive thread
         /// </summary>
-        string RequestType { get; }
-
-        /// <summary>
-        /// Returns HTTP server request URL
-        /// </summary>
-        string ToURL(string address);
+        void Close();
     }
 }

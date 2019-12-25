@@ -15,7 +15,7 @@
 
 using System.Net;
 
-namespace OpenNetworkLibrary
+namespace OpenNetworkLibrary.UDP
 {
     /// <summary>
     /// Datagram container structure
