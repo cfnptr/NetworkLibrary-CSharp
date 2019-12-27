@@ -13,29 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace OpenNetworkLibrary.HTTP
+namespace OpenNetworkLibrary.UDP
 {
     /// <summary>
-    /// Tasked hypertext transfer protocol client interface
+    /// Queued UDP socket interface (thread-safe)
     /// </summary>
-    public interface ITaskedHttpClient
+    public interface IQueuedSocket : ISocket
     {
         /// <summary>
-        /// Starts a new web request task
+        /// Dequeues next datagram from the queue (thread-safe)
         /// </summary>
-        void StartRequest(string requestUri);
-        /// <summary>
-        /// Returns true if web request has successfully completed
-        /// </summary>
-        bool GetResponse(out string response);
+        Datagram DequeueNext();
 
         /// <summary>
-        /// Returns true if web request is completed
+        /// Dequeues all datagrams from the queue (thread-safe)
         /// </summary>
-        bool IsRequestCompleted();
-        /// <summary>
-        /// Returns true if web request is faulted
-        /// </summary>
-        bool IsRequestFaulted();
+        Datagram[] DequeueAll();
     }
 }

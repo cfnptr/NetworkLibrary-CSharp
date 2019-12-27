@@ -13,21 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace OpenNetworkLibrary.HTTP
+using OpenNetworkLibrary.HTTP.Authorization;
+using OpenSharedLibrary.Gaming;
+
+namespace OpenNetworkLibrary.HTTP.Game
 {
     /// <summary>
-    /// HTTP request interface
+    /// Room HTTP server interface
     /// </summary>
-    public interface IHttpRequest
+    public interface IRoomServer : IAuthServer
     {
         /// <summary>
-        /// HTTP request type string value
+        /// HTTP server room array
         /// </summary>
-        string RequestType { get; }
-
-        /// <summary>
-        /// Returns HTTP request URL
-        /// </summary>
-        string ToURL(string address);
+        IRoomArray Rooms { get; }
     }
 }

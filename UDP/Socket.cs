@@ -22,9 +22,9 @@ using System.Threading;
 namespace OpenNetworkLibrary.UDP
 {
     /// <summary>
-    /// User datagram protocol IPv4 socket class
+    /// UDP socket abstract class
     /// </summary>
-    public abstract class UdpSocket : IUdpSocket
+    public abstract class Socket : ISocket
     {
         /// <summary>
         /// Maximal UDP datagram/packet size
@@ -42,7 +42,7 @@ namespace OpenNetworkLibrary.UDP
         /// <summary>
         /// UDP receive socket
         /// </summary>
-        protected readonly Socket socket;
+        protected readonly System.Net.Sockets.Socket socket;
         /// <summary>
         /// UDP receive thread
         /// </summary>
@@ -59,12 +59,21 @@ namespace OpenNetworkLibrary.UDP
         public bool IsRunning => isRunning;
 
         /// <summary>
-        /// Creates a new UDP socket class instance
+        /// UDP socket logger
         /// </summary>
-        public UdpSocket(ILogger logger)
+        public ILogger Logger => logger;
+        /// <summary>
+        /// UDP socket local ip end point
+        /// </summary>
+        public IPEndPoint LocalEndPoint => (IPEndPoint)socket.LocalEndPoint;
+
+        /// <summary>
+        /// Creates a new UDP socket abstract class instance
+        /// </summary>
+        public Socket(ILogger logger)
         {
             this.logger = logger ?? throw new ArgumentNullException();
-            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket = new System.Net.Sockets.Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             receiveThread = new Thread(ReceiveThreadLogic) { IsBackground = true, };
         }
 
@@ -77,11 +86,28 @@ namespace OpenNetworkLibrary.UDP
                 return;
 
             isRunning = true;
+
             socket.Bind(localEndPoint);
             receiveThread.Start();
 
             if (logger.Log(LogType.Info))
-                logger.Info("UDP socket started");
+                logger.Info("UDP socket started.");
+        }
+        /// <summary>
+        /// Binds UDP socket and starts receive thread
+        /// </summary>
+        public void Start(IPAddress address, int port)
+        {
+            var localEndPoint = new IPEndPoint(address, port);
+            Start(localEndPoint);
+        }
+        /// <summary>
+        /// Binds UDP socket and starts receive thread
+        /// </summary>
+        public void Start()
+        {
+            var localEndPoint = new IPEndPoint(IPAddress.Any, IPEndPoint.MinPort);
+            Start(localEndPoint);
         }
         /// <summary>
         /// Closes UDP socket socket and stops receive thread
@@ -98,7 +124,7 @@ namespace OpenNetworkLibrary.UDP
                 socket.Close();
 
                 if (logger.Log(LogType.Debug))
-                    logger.Debug("UDP socket instance closed");
+                    logger.Debug("UDP socket instance closed.");
             }
             catch (Exception exception)
             {
@@ -119,7 +145,7 @@ namespace OpenNetworkLibrary.UDP
             }
 
             if (logger.Log(LogType.Info))
-                logger.Info("UDP socket closed");
+                logger.Info("UDP socket closed.");
         }
 
         /// <summary>
@@ -130,7 +156,7 @@ namespace OpenNetworkLibrary.UDP
             var result = socket.SendTo(buffer, offset, count, SocketFlags.None, remoteEndPoint);
 
             if (logger.Log(LogType.Trace))
-                logger.Trace($"Sended UDP socket datagram (remoteEndPoint: {remoteEndPoint}, sendedBytes: {result})");
+                logger.Trace($"Sended UDP socket datagram. (remoteEndPoint: {remoteEndPoint}, sendedBytes: {result})");
 
             return result;
         }
@@ -142,7 +168,7 @@ namespace OpenNetworkLibrary.UDP
             var result = socket.SendTo(data, 0, data.Length, SocketFlags.None, remoteEndPoint);
 
             if (logger.Log(LogType.Trace))
-                logger.Trace($"Sended UDP socket datagram (remoteEndPoint: {remoteEndPoint}, sendedBytes: {result})");
+                logger.Trace($"Sended UDP socket datagram. (remoteEndPoint: {remoteEndPoint}, sendedBytes: {result})");
 
             return result;
         }
@@ -154,7 +180,20 @@ namespace OpenNetworkLibrary.UDP
             var result = socket.SendTo(datagram.data, 0, datagram.data.Length, SocketFlags.None, datagram.ipEndPoint);
 
             if (logger.Log(LogType.Trace))
-                logger.Trace($"Sended UDP socket datagram (remoteEndPoint: {datagram.ipEndPoint}, sendedBytes: {result})");
+                logger.Trace($"Sended UDP socket datagram. (remoteEndPoint: {datagram.ipEndPoint}, sendedBytes: {result})");
+
+            return result;
+        }
+        /// <summary>
+        /// Sends datagram to the specified remote end point
+        /// </summary>
+        public int Send(IRequestResponse requestResponse, IPEndPoint remoteEndPoint)
+        {
+            var data = requestResponse.ToData();
+            var result = socket.SendTo(data, 0, data.Length, SocketFlags.None, remoteEndPoint);
+
+            if (logger.Log(LogType.Trace))
+                logger.Trace($"Sended UDP socket datagram. (remoteEndPoint: {remoteEndPoint}, sendedBytes: {result})");
 
             return result;
         }
@@ -165,7 +204,7 @@ namespace OpenNetworkLibrary.UDP
         protected void ReceiveThreadLogic()
         {
             if (logger.Log(LogType.Debug))
-                logger.Debug("UDP socket receive thread started");
+                logger.Debug("UDP socket receive thread started.");
 
             var buffer = new byte[MaxUdpSize];
 
@@ -185,7 +224,7 @@ namespace OpenNetworkLibrary.UDP
                     var datagram = new Datagram(data, (IPEndPoint)endPoint);
 
                     if (logger.Log(LogType.Trace))
-                        logger.Trace($"Received UDP socket datagram (remoteEndPoint: {datagram.ipEndPoint}, length: {datagram.Length}, type: {datagram.Type})");
+                        logger.Trace($"Received UDP socket datagram. (remoteEndPoint: {datagram.ipEndPoint}, length: {datagram.Length}, type: {datagram.Type})");
 
                     OnDatagramReceive(datagram);
                 }
@@ -196,7 +235,7 @@ namespace OpenNetworkLibrary.UDP
             }
 
             if (logger.Log(LogType.Debug))
-                logger.Debug("UDP socket receive thread stopped");
+                logger.Debug("UDP socket receive thread stopped.");
         }
 
         /// <summary>
@@ -205,7 +244,7 @@ namespace OpenNetworkLibrary.UDP
         protected virtual void OnCloseException(Exception exception)
         {
             if (logger.Log(LogType.Fatal))
-                logger.Fatal($"Failed to close UDP socket: {exception}");
+                logger.Fatal($"Failed to close UDP socket. {exception}");
         }
         /// <summary>
         /// On UDP socket receive thread exception
@@ -215,12 +254,12 @@ namespace OpenNetworkLibrary.UDP
             if (exception is SocketException)
             {
                 if(logger.Log(LogType.Trace))
-                    logger.Trace($"Ignored UDP socket receive thread exception: {exception}");
+                    logger.Trace($"Ignored UDP socket receive thread exception. {exception}");
             }
             else
             {
                 if (logger.Log(LogType.Fatal))
-                    logger.Fatal($"UDP socket request thread exception: {exception}");
+                    logger.Fatal($"UDP socket request thread exception. {exception}");
 
                 Close();
             } 

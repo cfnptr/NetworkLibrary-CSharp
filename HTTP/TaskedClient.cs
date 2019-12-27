@@ -20,9 +20,9 @@ using System.Threading.Tasks;
 namespace OpenNetworkLibrary.HTTP
 {
     /// <summary>
-    /// Tasked hypertext transfer protocol client class
+    /// Tasked HTTP client class
     /// </summary>
-    public class TaskedHttpClient : HttpClient, ITaskedHttpClient
+    public class TaskedClient : HttpClient, ITaskedClient
     {
         /// <summary>
         /// HTTP client get string request task
@@ -30,23 +30,28 @@ namespace OpenNetworkLibrary.HTTP
         protected Task<string> requestTask;
 
         /// <summary>
+        /// Is request task response was returned at least once
+        /// </summary>
+        public bool IsResponseReturned { get; protected set; }
+
+        /// <summary>
         /// Creates a new tasked HTTP client class instance
         /// </summary>
-        public TaskedHttpClient()
+        public TaskedClient()
         {
             requestTask = Task.Factory.StartNew(() => { return string.Empty; });
         }
         /// <summary>
         /// Creates a new tasked HTTP client class instance
         /// </summary>
-        public TaskedHttpClient(HttpMessageHandler handler) : base(handler)
+        public TaskedClient(HttpMessageHandler handler) : base(handler)
         {
             requestTask = Task.Factory.StartNew(() => { return string.Empty; });
         }
         /// <summary>
         /// Creates a new tasked HTTP client class instance
         /// </summary>
-        public TaskedHttpClient(HttpMessageHandler handler, bool disposeHandler) : base(handler, disposeHandler)
+        public TaskedClient(HttpMessageHandler handler, bool disposeHandler) : base(handler, disposeHandler)
         {
             requestTask = Task.Factory.StartNew(() => { return string.Empty; });
         }
@@ -59,6 +64,7 @@ namespace OpenNetworkLibrary.HTTP
             if (!requestTask.IsCompleted)
                 throw new InvalidOperationException("Request task still running");
 
+            IsResponseReturned = false;
             requestTask = GetStringAsync(requestUri);
         }
 
@@ -80,6 +86,26 @@ namespace OpenNetworkLibrary.HTTP
                 response = requestTask.Result;
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Returns received HTTP server response
+        /// </summary>
+        public Response GetHttpResponse()
+        {
+            IsResponseReturned = true;
+
+            if (GetResponse(out string response))
+            {
+                var pair = response.Split('\n');
+
+                if (pair.Length == 2)
+                    return new Response(true, pair[0], pair[1]);
+                else
+                    return new Response(false, response, response);
+            }
+
+            return new Response(false);
         }
 
         /// <summary>

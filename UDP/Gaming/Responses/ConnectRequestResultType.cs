@@ -13,16 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace OpenNetworkLibrary.HTTP
+namespace OpenNetworkLibrary.UDP.Gaming.Responses
 {
     /// <summary>
-    /// Hypertext transfer protocol server interface
+    /// Server connect request result type
     /// </summary>
-    public interface IHttpServer
+    public enum ConnectRequestResultType
     {
-        /// <summary>
-        /// Closes HTTP server socket and stops receive thread
-        /// </summary>
-        void Close();
+        Success = ResponseResultType.Success,
+        BadRequest = ResponseResultType.BadRequest,
+
+        IncorrectToken,
     }
 }

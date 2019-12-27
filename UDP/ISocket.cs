@@ -13,14 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using OpenSharedLibrary.Logging;
 using System.Net;
 
 namespace OpenNetworkLibrary.UDP
 {
     /// <summary>
-    /// User datagram protocol IPv4 socket interface
+    /// UDP socket interface
     /// </summary>
-    public interface IUdpSocket
+    public interface ISocket
     {
         /// <summary>
         /// Is UDP socket threads still running
@@ -28,9 +29,27 @@ namespace OpenNetworkLibrary.UDP
         bool IsRunning { get; }
 
         /// <summary>
+        /// UDP socket logger
+        /// </summary>
+        ILogger Logger { get; }
+        /// <summary>
+        /// UDP socket local ip end point
+        /// </summary>
+        IPEndPoint LocalEndPoint { get; }
+
+        /// <summary>
         /// Binds UDP socket and starts receive thread
         /// </summary>
         void Start(IPEndPoint localEndPoint);
+        /// <summary>
+        /// Binds UDP socket and starts receive thread
+        /// </summary>
+        void Start(IPAddress address, int port);
+        /// <summary>
+        /// Binds UDP socket and starts receive thread
+        /// </summary>
+        void Start();
+
         /// <summary>
         /// Closes UDP socket socket and stops receive thread
         /// </summary>
@@ -48,5 +67,9 @@ namespace OpenNetworkLibrary.UDP
         /// Sends datagram to the specified remote end point
         /// </summary>
         int Send(Datagram datagram);
+        /// <summary>
+        /// Sends datagram to the specified remote end point
+        /// </summary>
+        int Send(IRequestResponse requestResponse, IPEndPoint remoteEndPoint);
     }
 }

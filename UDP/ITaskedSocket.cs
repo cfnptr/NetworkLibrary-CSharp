@@ -13,21 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace OpenNetworkLibrary.HTTP
+namespace OpenNetworkLibrary.UDP
 {
     /// <summary>
-    /// HTTP response interface
+    /// Tasked UDP socket interface
     /// </summary>
-    public interface IHttpResponse
+    public interface ITaskedSocket : ISocket
     {
         /// <summary>
-        /// HTTP response type string value
+        /// Still active task count
         /// </summary>
-        string ResponseType { get; }
-
-        /// <summary>
-        /// Returns HTTP response body
-        /// </summary>
-        string ToBody();
+        int TaskCount { get; }
     }
 }

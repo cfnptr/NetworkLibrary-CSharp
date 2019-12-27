@@ -16,9 +16,9 @@
 namespace OpenNetworkLibrary.HTTP
 {
     /// <summary>
-    /// HTTP server response container structure
+    /// HTTP response container structure
     /// </summary>
-    public struct HttpResponse
+    public struct Response
     {
         /// <summary>
         /// Is response received and correct
@@ -34,18 +34,18 @@ namespace OpenNetworkLibrary.HTTP
         public string data;
 
         /// <summary>
-        /// Creates a new HTTP server response structure instance
+        /// Creates a new HTTP response structure instance
         /// </summary>
-        public HttpResponse(bool status, string type, string data)
+        public Response(bool status, string type, string data)
         {
             this.status = status;
             this.type = type;
             this.data = data;
         }
         /// <summary>
-        /// Creates a new HTTP server response structure instance
+        /// Creates a new HTTP response structure instance
         /// </summary>
-        public HttpResponse(bool status)
+        public Response(bool status)
         {
             this.status = status;
             type = string.Empty;
