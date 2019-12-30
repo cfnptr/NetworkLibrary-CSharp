@@ -20,7 +20,7 @@ namespace OpenNetworkLibrary.HTTP
     /// <summary>
     /// HTTP server interface
     /// </summary>
-    public interface IServer
+    public interface IHttpServer
     {
         /// <summary>
         /// Is server threads still running

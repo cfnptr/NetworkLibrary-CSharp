@@ -13,23 +13,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using OpenSharedLibrary.Containers;
-using OpenSharedLibrary.Credentials;
+using OpenSharedLibrary.Credentials.Accounts;
+using System;
 
 namespace OpenNetworkLibrary.HTTP.Authorization
 {
     /// <summary>
-    /// Authorization HTTP server interface
+    /// Authorization server interface
     /// </summary>
-    public interface IAuthServer : IServer
+    public interface IAuthServer<TAccount, TAccountFactory> : IHttpServer
+        where TAccount : IAccount
+        where TAccountFactory : IAccountFactory<TAccount>
     {
         /// <summary>
-        /// HTTP server account database
+        /// Server version
         /// </summary>
-        IDatabase<Username, IAccount> AccountDatabase { get; }
+        Version Version { get; }
         /// <summary>
         /// Account factory
         /// </summary>
-        IAccountFactory AccountFactory { get; }
+        TAccountFactory AccountFactory { get; }
+        /// <summary>
+        /// Account database
+        /// </summary>
+        IAccountDatabase<TAccount, TAccountFactory> AccountDatabase { get; }
     }
 }

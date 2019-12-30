@@ -1,5 +1,4 @@
-﻿
-// Copyright 2019 Nikita Fediuchin (QuantumBranch)
+﻿// Copyright 2019 Nikita Fediuchin (QuantumBranch)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,21 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using OpenSharedLibrary.Credentials;
+using OpenSharedLibrary.Gaming.Players;
 using System;
 using System.IO;
 
 namespace OpenNetworkLibrary.UDP.Gaming.Requests
 {
     /// <summary>
-    /// Connect request container class
+    /// Transform player request container class
     /// </summary>
-    public class ConnectRequest : IRequestResponse
+    public class TransformPlayerRequest : IRequestResponse
     {
         /// <summary>
         /// Request byte size of the datagram data array
         /// </summary>
-        public const int ByteSize = Datagram.HeaderByteSize + sizeof(long) + Token.ByteSize;
+        public const int ByteSize = Datagram.HeaderByteSize + PlayerTransform.ByteSize;
+        /// <summary>
+        /// Minimum delay between two transform requests
+        /// </summary>
+        public const long MinRequestDelay = 33;
 
         /// <summary>
         /// Request byte size of the datagram data array
@@ -35,30 +38,25 @@ namespace OpenNetworkLibrary.UDP.Gaming.Requests
         public int DataByteSize => ByteSize;
 
         /// <summary>
-        /// Player identifier
+        /// Player transform container
         /// </summary>
-        public long id;
-        /// <summary>
-        /// Connect token
-        /// </summary>
-        public Token connectToken;
+        public PlayerTransform playerTransform;
 
         /// <summary>
-        /// Creates a new connect request class instance
+        /// Creates a new transform player request class instance
         /// </summary>
-        public ConnectRequest() { }
+        public TransformPlayerRequest() { }
         /// <summary>
-        /// Creates a new connect request class instance
+        /// Creates a new transform player request class instance
         /// </summary>
-        public ConnectRequest(long id, Token connectToken)
+        public TransformPlayerRequest(PlayerTransform playerTransform)
         {
-            this.id = id;
-            this.connectToken = connectToken;
+            this.playerTransform = playerTransform;
         }
         /// <summary>
-        /// Creates a new connect request class instance
+        /// Creates a new transform player request class instance
         /// </summary>
-        public ConnectRequest(Datagram datagram)
+        public TransformPlayerRequest(Datagram datagram)
         {
             if (datagram.Length != ByteSize)
                 throw new ArgumentException();
@@ -67,8 +65,7 @@ namespace OpenNetworkLibrary.UDP.Gaming.Requests
             memoryStream.Seek(Datagram.HeaderByteSize, SeekOrigin.Begin);
 
             using var binaryReader = new BinaryReader(memoryStream);
-            id = binaryReader.ReadInt64();
-            connectToken = new Token(binaryReader);
+            playerTransform = new PlayerTransform(binaryReader);
         }
 
         /// <summary>
@@ -79,9 +76,8 @@ namespace OpenNetworkLibrary.UDP.Gaming.Requests
             var data = new byte[DataByteSize];
             using var memoryStream = new MemoryStream(data);
             using var binaryWriter = new BinaryWriter(memoryStream);
-            binaryWriter.Write((byte)RequestType.Connect);
-            binaryWriter.Write(id);
-            connectToken.ToBytes(binaryWriter);
+            binaryWriter.Write((byte)GameRequestType.TransformPlayer);
+            playerTransform.ToBytes(binaryWriter);
             return data;
         }
     }

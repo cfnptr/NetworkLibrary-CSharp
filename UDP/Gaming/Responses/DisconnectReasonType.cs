@@ -23,9 +23,6 @@ namespace OpenNetworkLibrary.UDP.Gaming.Responses
         UnknownDatagram = 0,
         Requested = 1,
         RoomHasClosed = 2,
-
-        RequestTimeOut,
-        BadTransformRequest,
-        BadGetSegmentRequest,
+        RequestTimeOut = 3,
     }
 }

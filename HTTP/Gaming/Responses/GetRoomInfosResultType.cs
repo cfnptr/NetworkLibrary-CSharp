@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace OpenNetworkLibrary.HTTP.Game.Responses
+namespace OpenNetworkLibrary.HTTP.Gaming.Responses
 {
     /// <summary>
     /// Gt room infos request result type

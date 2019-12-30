@@ -16,7 +16,7 @@
 using OpenSharedLibrary.Credentials;
 using System;
 
-namespace OpenNetworkLibrary.HTTP.Game.Responses
+namespace OpenNetworkLibrary.HTTP.Gaming.Responses
 {
     /// <summary>
     /// Join room response container class
@@ -38,10 +38,6 @@ namespace OpenNetworkLibrary.HTTP.Game.Responses
         /// </summary>
         public int result;
         /// <summary>
-        /// Room version
-        /// </summary>
-        public Version version;
-        /// <summary>
         /// Room connect token
         /// </summary>
         public Token connectToken;
@@ -53,10 +49,9 @@ namespace OpenNetworkLibrary.HTTP.Game.Responses
         /// <summary>
         /// Creates a new join room response class instance
         /// </summary>
-        public JoinRoomResponse(int result, Version version = null, Token connectToken = null)
+        public JoinRoomResponse(int result, Token connectToken = null)
         {
             this.result = result;
-            this.version = version;
             this.connectToken = connectToken;
         }
         /// <summary>
@@ -70,11 +65,10 @@ namespace OpenNetworkLibrary.HTTP.Game.Responses
             {
                 result = int.Parse(values[0]);
             }
-            else if (values.Length == 3)
+            else if (values.Length == 2)
             {
                 result = int.Parse(values[0]);
-                version = new Version(values[1]);
-                connectToken = new Token(values[2]);
+                connectToken = new Token(values[1]);
             }
             else
             {
@@ -88,7 +82,7 @@ namespace OpenNetworkLibrary.HTTP.Game.Responses
         public string ToBody()
         {
             if(connectToken != null)
-                return $"{Type}\n{result} {version} {connectToken.ToBase64()}";
+                return $"{Type}\n{result} {connectToken.ToBase64()}";
             else
                 return $"{Type}\n{result}";
         }

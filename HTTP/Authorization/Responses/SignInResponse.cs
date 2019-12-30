@@ -38,6 +38,10 @@ namespace OpenNetworkLibrary.HTTP.Authorization.Responses
         /// </summary>
         public int result;
         /// <summary>
+        /// Server version
+        /// </summary>
+        public Version version;
+        /// <summary>
         /// Account access token
         /// </summary>
         public Token accessToken;
@@ -49,9 +53,10 @@ namespace OpenNetworkLibrary.HTTP.Authorization.Responses
         /// <summary>
         /// Creates a new sign in response class instance
         /// </summary>
-        public SignInResponse(int result, Token accessToken = null)
+        public SignInResponse(int result, Version version = null, Token accessToken = null)
         {
             this.result = result;
+            this.version = version;
             this.accessToken = accessToken;
         }
         /// <summary>
@@ -65,10 +70,11 @@ namespace OpenNetworkLibrary.HTTP.Authorization.Responses
             {
                 result = int.Parse(values[0]);
             }
-            else if (values.Length == 2)
+            else if (values.Length == 3)
             {
                 result = int.Parse(values[0]);
-                accessToken = new Token(values[1]);
+                version = new Version(values[1]);
+                accessToken = new Token(values[12]);
             }
             else
             {
@@ -82,7 +88,7 @@ namespace OpenNetworkLibrary.HTTP.Authorization.Responses
         public string ToBody()
         {
             if(accessToken != null)
-                return $"{Type}\n{result} {accessToken.ToBase64()}";
+                return $"{Type}\n{result} {version} {accessToken.ToBase64()}";
             else
                 return $"{Type}\n{result}";
         }

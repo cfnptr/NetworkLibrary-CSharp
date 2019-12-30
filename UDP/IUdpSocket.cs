@@ -21,7 +21,7 @@ namespace OpenNetworkLibrary.UDP
     /// <summary>
     /// UDP socket interface
     /// </summary>
-    public interface ISocket
+    public interface IUdpSocket
     {
         /// <summary>
         /// Is UDP socket threads still running

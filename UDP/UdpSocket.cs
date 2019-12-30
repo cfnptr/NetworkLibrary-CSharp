@@ -24,12 +24,12 @@ namespace OpenNetworkLibrary.UDP
     /// <summary>
     /// UDP socket abstract class
     /// </summary>
-    public abstract class Socket : ISocket
+    public abstract class UdpSocket : IUdpSocket
     {
         /// <summary>
         /// Maximal UDP datagram/packet size
         /// </summary>
-        public const int MaxUdpSize = 65536;
+        public const int MaxUdpSize = ushort.MaxValue + 1;
         /// <summary>
         /// Default request time out value in the milliseconds
         /// </summary>
@@ -42,7 +42,7 @@ namespace OpenNetworkLibrary.UDP
         /// <summary>
         /// UDP receive socket
         /// </summary>
-        protected readonly System.Net.Sockets.Socket socket;
+        protected readonly Socket socket;
         /// <summary>
         /// UDP receive thread
         /// </summary>
@@ -70,10 +70,10 @@ namespace OpenNetworkLibrary.UDP
         /// <summary>
         /// Creates a new UDP socket abstract class instance
         /// </summary>
-        public Socket(ILogger logger)
+        public UdpSocket(ILogger logger)
         {
             this.logger = logger ?? throw new ArgumentNullException();
-            socket = new System.Net.Sockets.Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             receiveThread = new Thread(ReceiveThreadLogic) { IsBackground = true, };
         }
 
@@ -109,6 +109,7 @@ namespace OpenNetworkLibrary.UDP
             var localEndPoint = new IPEndPoint(IPAddress.Any, IPEndPoint.MinPort);
             Start(localEndPoint);
         }
+
         /// <summary>
         /// Closes UDP socket socket and stops receive thread
         /// </summary>

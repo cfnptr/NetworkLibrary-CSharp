@@ -13,23 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using OpenNetworkLibrary.HTTP.Authorization;
-using OpenSharedLibrary.Credentials.Accounts;
-using OpenSharedLibrary.Gaming.Rooms;
-
-namespace OpenNetworkLibrary.HTTP.Gaming
+namespace OpenNetworkLibrary.UDP.Gaming
 {
     /// <summary>
-    /// Room server interface
+    /// Game request type
     /// </summary>
-    public interface IRoomServer<TRoom, TAccount, TAccountFactory> : IAuthServer<TAccount, TAccountFactory>
-        where TRoom : IRoom
-        where TAccount : IAccount
-        where TAccountFactory : IAccountFactory<TAccount>
+    public enum GameRequestType : byte
     {
-        /// <summary>
-        /// Room concurrent collection
-        /// </summary>
-        public RoomDictionary<TRoom, TAccount> Rooms { get; }
+        TransformPlayer = RequestType.Disconnect + 1,
     }
 }

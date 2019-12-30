@@ -36,9 +36,9 @@ namespace OpenNetworkLibrary.HTTP.Authorization.Requests
         public string RequestType => Type;
 
         /// <summary>
-        /// Account username
+        /// Account name
         /// </summary>
-        public Username username;
+        public Username name;
         /// <summary>
         /// Account passhash
         /// </summary>
@@ -55,9 +55,9 @@ namespace OpenNetworkLibrary.HTTP.Authorization.Requests
         /// <summary>
         /// Creates a new sign up request class instance
         /// </summary>
-        public SignUpRequest(Username username, Passhash passhash, EmailAddress emailAddress)
+        public SignUpRequest(Username name, Passhash passhash, EmailAddress emailAddress)
         {
-            this.username = username;
+            this.name = name;
             this.passhash = passhash;
             this.emailAddress = emailAddress;
         }
@@ -70,7 +70,7 @@ namespace OpenNetworkLibrary.HTTP.Authorization.Requests
             if (queryString.Count != 3)
                 throw new ArgumentException();
 
-            username = new Username(queryString.Get(0));
+            name = new Username(queryString.Get(0));
             passhash = new Passhash(queryString.Get(1));
             emailAddress = new EmailAddress(queryString.Get(2));
         }
@@ -80,7 +80,7 @@ namespace OpenNetworkLibrary.HTTP.Authorization.Requests
         /// </summary>
         public string ToURL(string address)
         {
-            return $"{address}{Type}?u={username}&p={WebUtility.UrlEncode(passhash.ToBase64())}&e={WebUtility.UrlEncode(emailAddress)}";
+            return $"{address}{Type}?n={name}&p={WebUtility.UrlEncode(passhash.ToBase64())}&e={WebUtility.UrlEncode(emailAddress)}";
         }
     }
 }

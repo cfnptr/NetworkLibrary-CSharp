@@ -18,7 +18,7 @@ namespace OpenNetworkLibrary.UDP
     /// <summary>
     /// Tasked UDP socket interface
     /// </summary>
-    public interface ITaskedSocket : ISocket
+    public interface ITaskedSocket : IUdpSocket
     {
         /// <summary>
         /// Still active task count

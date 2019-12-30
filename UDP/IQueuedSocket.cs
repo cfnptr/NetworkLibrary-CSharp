@@ -18,7 +18,7 @@ namespace OpenNetworkLibrary.UDP
     /// <summary>
     /// Queued UDP socket interface (thread-safe)
     /// </summary>
-    public interface IQueuedSocket : ISocket
+    public interface IQueuedSocket : IUdpSocket
     {
         /// <summary>
         /// Dequeues next datagram from the queue (thread-safe)

@@ -15,8 +15,8 @@
 
 using OpenNetworkLibrary.HTTP.Authorization.Requests;
 using OpenNetworkLibrary.HTTP.Authorization.Responses;
-using OpenSharedLibrary.Containers;
 using OpenSharedLibrary.Credentials;
+using OpenSharedLibrary.Credentials.Accounts;
 using OpenSharedLibrary.Logging;
 using System;
 using System.Collections.Specialized;
@@ -25,35 +25,46 @@ using System.Net;
 namespace OpenNetworkLibrary.HTTP.Authorization
 {
     /// <summary>
-    /// Authorization HTTP server class
+    /// HTTP Authorization server class
     /// </summary>
-    public class AuthServer : Server, IAuthServer
+    public class AuthServer<TAccount, TAccountFactory> : HttpServer, IAuthServer<TAccount, TAccountFactory>
+        where TAccount : IAccount
+        where TAccountFactory : IAccountFactory<TAccount>
     {
         /// <summary>
-        /// Account database
+        /// Server version
         /// </summary>
-        protected readonly IDatabase<Username, IAccount> accountDatabase;
+        protected readonly Version version;
         /// <summary>
         /// Account factory
         /// </summary>
-        protected readonly IAccountFactory accountFactory;
+        protected readonly TAccountFactory accountFactory;
+        /// <summary>
+        /// Account database
+        /// </summary>
+        protected readonly IAccountDatabase<TAccount, TAccountFactory> accountDatabase;
 
         /// <summary>
-        /// Account database
+        /// Server version
         /// </summary>
-        public IDatabase<Username, IAccount> AccountDatabase => accountDatabase;
+        public Version Version => version;
         /// <summary>
         /// Account factory
         /// </summary>
-        public IAccountFactory AccountFactory => accountFactory;
+        public TAccountFactory AccountFactory => accountFactory;
+        /// <summary>
+        /// Account database
+        /// </summary>
+        public IAccountDatabase<TAccount, TAccountFactory> AccountDatabase => accountDatabase;
 
         /// <summary>
         /// Creates a new HTTP server class instance
         /// </summary>
-        public AuthServer(IDatabase<Username, IAccount> accountDatabase, IAccountFactory accountFactory, ILogger logger, string address) : base(logger, address)
+        public AuthServer(Version version, TAccountFactory accountFactory, IAccountDatabase<TAccount, TAccountFactory> accountDatabase, ILogger logger, string address) : base(logger, address)
         {
-            this.accountDatabase = accountDatabase ?? throw new ArgumentNullException();
+            this.version = version ?? throw new ArgumentNullException();
             this.accountFactory = accountFactory ?? throw new ArgumentNullException();
+            this.accountDatabase = accountDatabase ?? throw new ArgumentNullException();
             listener.Prefixes.Add($"{address}{SignUpRequest.Type}/");
             listener.Prefixes.Add($"{address}{SignInRequest.Type}/");
         }
@@ -90,26 +101,26 @@ namespace OpenNetworkLibrary.HTTP.Authorization
             {
                 var request = new SignUpRequest(queryString);
 
-                if (accountDatabase.Contains(request.username))
+                if (accountDatabase.ContainsKey(request.name))
                 {
                     response = new SignUpResponse((int)SignUpResultType.UsernameBusy);
                     SendResponse(htppResponse, response);
 
                     if (logger.Log(LogType.Trace))
-                        logger.Trace($"Sended HTTP server sign up response, username busy. (username: {request.username}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
+                        logger.Trace($"Sended HTTP server sign up response, username busy. (username: {request.name}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
 
                     return;
                 }
 
-                var accountData = accountFactory.Create(request.username, request.passhash, request.emailAddress, Token.Create(), false, 0, DateTime.Now, httpRequest.RemoteEndPoint.Address);
+                var accountData = accountFactory.Create(accountDatabase.Count, false, 0, request.name, request.passhash, request.emailAddress, Token.Create(), httpRequest.RemoteEndPoint.Address);
 
-                if (!accountDatabase.Write(request.username, accountData))
+                if (!accountDatabase.TryAdd(accountData))
                 {
                     response = new SignUpResponse((int)SignUpResultType.FailedToWrite);
                     SendResponse(htppResponse, response);
 
                     if (logger.Log(LogType.Error))
-                        logger.Error($"Failed to write account to the database on sign up request. (username: {request.username}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
+                        logger.Error($"Failed to add account to the database on sign up request. (username: {request.name}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
 
                     return;
                 }
@@ -118,7 +129,7 @@ namespace OpenNetworkLibrary.HTTP.Authorization
                 SendResponse(htppResponse, response);
 
                 if (logger.Log(LogType.Info))
-                    logger.Info($"Signed up a new account. (username: {request.username}, email: {request.emailAddress}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
+                    logger.Info($"Signed up a new account. (username: {request.name}, email: {request.emailAddress}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
             }
             catch
             {
@@ -136,62 +147,60 @@ namespace OpenNetworkLibrary.HTTP.Authorization
             try
             {
                 var request = new SignUpRequest(queryString);
-                var accountData = accountDatabase.Read(request.username);
 
-                if (accountData == null)
+                if (!accountDatabase.TryGetValue(request.name, accountFactory, out TAccount account))
                 {
                     response = new SignInResponse((int)SignInResultType.IncorrectUsername);
                     SendResponse(httpResponse, response);
 
                     if (logger.Log(LogType.Trace))
-                        logger.Trace($"Sended HTTP server sign in response, incorrect username. (username: {request.username}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
+                        logger.Trace($"Sended HTTP server sign in response, incorrect username. (username: {request.name}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
 
                     return;
                 }
 
-                if (request.passhash != accountData.Passhash)
+                if (request.passhash != account.Passhash)
                 {
                     response = new SignInResponse((int)SignInResultType.IncorrectPassword);
                     SendResponse(httpResponse, response);
 
                     if (logger.Log(LogType.Trace))
-                        logger.Trace($"Sended HTTP server sign in response, incorrect password. (username: {request.username}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
+                        logger.Trace($"Sended HTTP server sign in response, incorrect password. (username: {request.name}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
 
                     return;
                 }
 
-                if (accountData.IsBlocked)
+                if (account.IsBlocked)
                 {
                     response = new SignInResponse((int)SignInResultType.AccountIsBlocked);
                     SendResponse(httpResponse, response);
 
                     if (logger.Log(LogType.Trace))
-                        logger.Trace($"Sended HTTP server sign in response, account is blocked. (username: {request.username}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
+                        logger.Trace($"Sended HTTP server sign in response, account is blocked. (username: {request.name}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
 
                     return;
                 }
 
                 var accessToken = Token.Create();
-                accountData.DateTime = DateTime.Now;
-                accountData.IpAddress = httpRequest.RemoteEndPoint.Address;
-                accountData.AccessToken = accessToken;
+                account.AccessToken = accessToken;
+                account.LastUseIpAddress = httpRequest.RemoteEndPoint.Address;
 
-                if (!accountDatabase.Write(request.username, accountData))
+                if (!accountDatabase.TryUpdate(account))
                 {
                     response = new SignInResponse((int)SignInResultType.FailedToWrite);
                     SendResponse(httpResponse, response);
 
                     if (logger.Log(LogType.Error))
-                        logger.Error($"Failed to write account to the database on sign in request. (username: {request.username}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
+                        logger.Error($"Failed to update account in the database on sign in request. (username: {request.name}, remoteEndPoint: {httpRequest.RemoteEndPoint})");
 
                     return;
                 }
 
-                response = new SignInResponse((int)SignInResultType.Success, accessToken);
+                response = new SignInResponse((int)SignInResultType.Success, version, accessToken);
                 SendResponse(httpResponse, response);
 
                 if (logger.Log(LogType.Info))
-                    logger.Info($"Account signed in. (username: {request.username}, remoreEndPoint: {httpRequest.RemoteEndPoint})");
+                    logger.Info($"Account signed in. (username: {request.name}, remoreEndPoint: {httpRequest.RemoteEndPoint})");
             }
             catch
             {

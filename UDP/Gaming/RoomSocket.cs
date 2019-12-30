@@ -13,98 +13,116 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using OpenSharedLibrary.Gaming;
 using OpenSharedLibrary.Credentials;
 using OpenSharedLibrary.Logging;
 using System;
-using System.Diagnostics;
 using OpenNetworkLibrary.UDP.Gaming.Responses;
 using OpenNetworkLibrary.UDP.Gaming.Requests;
+using OpenSharedLibrary.Gaming.Players;
+using OpenSharedLibrary.Credentials.Accounts;
+using OpenSharedLibrary.Timing;
+using OpenSharedLibrary.Gaming.Rooms;
 
 namespace OpenNetworkLibrary.UDP.Gaming
 {
     /// <summary>
     /// Room UDP sockcet class
     /// </summary>
-    public class RoomSocket : TaskedSocket, IRoomSocket
+    public class RoomSocket<TPlayer, TPlayerFactory> : TaskedSocket, IRoomSocket<TPlayer, TPlayerFactory>
+        where TPlayer : IPlayer
+        where TPlayerFactory : IPlayerFactory<TPlayer>
     {
         /// <summary>
-        /// Room information container
+        /// Room identifier
         /// </summary>
-        protected readonly RoomInfo info;
-
+        protected readonly long id;
         /// <summary>
-        /// Current room player count
+        /// Room name
         /// </summary>
-        protected int playerCount;
+        protected string name;
         /// <summary>
-        /// Maximum room player count
+        /// Room maximum player count
         /// </summary>
         protected int maxPlayerCount;
 
         /// <summary>
-        /// Player database
+        /// Room clock
         /// </summary>
-        protected readonly IPlayerDatabase playerDatabase;
+        protected readonly IClock clock;
         /// <summary>
         /// Player factory
         /// </summary>
-        protected readonly IPlayerFactory playerFactory;
+        protected readonly TPlayerFactory playerFactory;
         /// <summary>
-        /// Player array
+        /// Player concurrent database
         /// </summary>
-        protected readonly IPlayerArray players;
+        protected readonly IPlayerDatabase<TPlayer, TPlayerFactory> playerDatabase;
+        /// <summary>
+        /// Player concurrent dictionary
+        /// </summary>
+        protected readonly PlayerDictionary<TPlayer> players;
 
         /// <summary>
-        /// Room timer
+        /// Room identifier
         /// </summary>
-        protected readonly Stopwatch timer;
-
+        public long ID
+        {
+            get { return id; }
+            set { throw new InvalidOperationException(); }
+        }
         /// <summary>
-        /// Room information container
+        /// Room name
         /// </summary>
-        public RoomInfo Info => info;
+        public string Name
+        {
+            get { return name; }
+            set { name = value.Replace(";", ""); }
+        }
+        /// <summary>
+        /// Maximum room player count
+        /// </summary>
+        public int MaxPlayerCount
+        {
+            get { return maxPlayerCount; }
+            set { maxPlayerCount = value > 0 ? value : throw new ArgumentException(); }
+        }
 
         /// <summary>
         /// Current room player count
         /// </summary>
-        public int PlayerCount => playerCount;
-        /// <summary>
-        /// Maximum room player count
-        /// </summary>
-        public int MaxPlayerCount => maxPlayerCount;
+        public int PlayerCount => players.Count;
 
         /// <summary>
-        /// Player database
+        /// Room clock
         /// </summary>
-        public IPlayerDatabase PlayerDatabase => playerDatabase;
+        public IClock Clock => clock;
         /// <summary>
         /// Player factory
         /// </summary>
-        public IPlayerFactory PlayerFactory => playerFactory;
+        public TPlayerFactory PlayerFactory => playerFactory;
         /// <summary>
-        /// Player array
+        /// Player database
         /// </summary>
-        public IPlayerArray Players => players;
-
+        public IPlayerDatabase<TPlayer, TPlayerFactory> PlayerDatabase => playerDatabase;
         /// <summary>
-        /// Room timer
+        /// Player concurrent dictionary
         /// </summary>
-        public Stopwatch Timer => timer;
+        public PlayerDictionary<TPlayer> Players => players;
 
         /// <summary>
         /// Creates a new room UDP socket class instance
         /// </summary>
-        public RoomSocket(RoomInfo info, int maxPlayerCount, IPlayerDatabase playerDatabase, IPlayerFactory playerFactory, IPlayerArray players, Stopwatch timer, int maxTaskCount, ILogger logger) : base(maxTaskCount, logger)
+        public RoomSocket(long id, string name, int maxPlayerCount, IClock clock, TPlayerFactory playerFactory, IPlayerDatabase<TPlayer, TPlayerFactory> playerDatabase, PlayerDictionary<TPlayer> players, int maxTaskCount, ILogger logger) : base(maxTaskCount, logger)
         {
-            this.info = info;
-            this.maxPlayerCount = maxPlayerCount;
+            this.id = id;
 
-            this.playerDatabase = playerDatabase ?? throw new ArgumentNullException();
+            Name = name;
+            MaxPlayerCount = maxPlayerCount;
+
+            this.clock = clock ?? throw new ArgumentNullException();
             this.playerFactory = playerFactory ?? throw new ArgumentNullException();
+            this.playerDatabase = playerDatabase ?? throw new ArgumentNullException();
             this.players = players ?? throw new ArgumentNullException();
-
-            this.timer = timer ?? throw new ArgumentNullException();
         }
 
         /// <summary>
@@ -112,24 +130,21 @@ namespace OpenNetworkLibrary.UDP.Gaming
         /// </summary>
         public override bool Equals(object obj)
         {
-            if (obj is IRoom room)
-                return info.ID.Equals(room.Info.ID);
-            else
-                throw new ArgumentException();
+            return id.Equals(((IRoom)obj).ID);
         }
         /// <summary>
         /// Returns room socket hash code 
         /// </summary>
         public override int GetHashCode()
         {
-            return info.ID;
+            return id.GetHashCode();
         }
         /// <summary>
         /// Returns room socket string
         /// </summary>
         public override string ToString()
         {
-            return info.ID.ToString();
+            return id.ToString();
         }
 
         /// <summary>
@@ -137,35 +152,21 @@ namespace OpenNetworkLibrary.UDP.Gaming
         /// </summary>
         public int CompareTo(object obj)
         {
-            if (obj is IRoom room)
-                return Info.ID.CompareTo(room.Info.ID);
-            else
-                throw new ArgumentException();
+            return id.CompareTo(((IRoom)obj).ID);
         }
         /// <summary>
         /// Compares two room sockets
         /// </summary>
         public int CompareTo(IRoom other)
         {
-            return info.ID.CompareTo(other.Info.ID);
+            return id.CompareTo(other.ID);
         }
         /// <summary>
         /// Returns true if room sockets is equal
         /// </summary>
         public bool Equals(IRoom other)
         {
-            return info.ID.Equals(other.Info.ID);
-        }
-
-        /// <summary>
-        /// Sets a new maximum room player count
-        /// </summary>
-        public void SetMaxPlayerCount(int count)
-        {
-            if (count < 0)
-                throw new ArgumentException();
-
-            maxPlayerCount = count;
+            return id.Equals(other.ID);
         }
 
         /// <summary>
@@ -173,25 +174,23 @@ namespace OpenNetworkLibrary.UDP.Gaming
         /// </summary>
         public bool JoinPlayer(IAccount account, out RoomInfo roomInfo, out Token connectToken)
         {
-            roomInfo = info;
             connectToken = Token.Create();
+            roomInfo = new RoomInfo(id, name);
 
-            var player = playerDatabase.Read(account.Username);
+            if (!playerDatabase.TryGetValue(account.ID, playerFactory, out TPlayer player)) { }
+                player = playerFactory.Create(account.ID, clock.MS, account.Name, connectToken, null);   
 
-            if (player == null)
-                player = playerFactory.Create(account.Username, connectToken, null, timer.ElapsedMilliseconds);
-
-            return players.Add(account.Username, player);
+            return players.TryAdd(player.ID, player);
         }
         /// <summary>
         /// Returns true if player has disconnected from the room
         /// </summary>
-        public bool DisconnectPlayer(Username username, int reason)
+        public bool DisconnectPlayer(long id, int reason)
         {
-            if (!players.Remove(username, out IPlayer player))
+            if (!players.TryRemove(id, out TPlayer player))
             {
-                if (logger.Log(LogType.Trace))
-                    logger.Trace($"Failed to remove player from the array on disconnect. (room: {ToString()}, username: {player.Username}, remoteEndPoint: {player.RemoteEndPoint}, reason: {reason})");
+                if (logger.Log(LogType.Debug))
+                    logger.Debug($"Failed to remove player from the array on disconnect. (id: {player.ID}, remoteEndPoint: {player.RemoteEndPoint}, reason: {reason}, roomID: {id})");
 
                 return false;
             }
@@ -201,30 +200,22 @@ namespace OpenNetworkLibrary.UDP.Gaming
                 var response = new DisconnectedResponse(reason);
                 Send(response, player.RemoteEndPoint);
 
-                if (!playerDatabase.Write(player.Username, player))
+                if (!playerDatabase.TryUpdate(player))
                 {
                     if (logger.Log(LogType.Error))
-                        logger.Error($"Failed to write player to the database on disconnect. (username: {player.Username}, remoteEndPoint: {player.RemoteEndPoint}, reason: {reason}, roomInfo: {info})");
+                        logger.Error($"Failed to update player in the database on disconnect. (id: {player.ID}, remoteEndPoint: {player.RemoteEndPoint}, reason: {reason}, rommID: {id})");
                 }
 
                 if (logger.Log(LogType.Info))
-                    logger.Info($"Disconnected server player. (username: {player.Username}, remoteEndPoint: {player.RemoteEndPoint}, reason: {reason}, roomInfo: {info})");
+                    logger.Info($"Disconnected server player. (id: {player.ID}, remoteEndPoint: {player.RemoteEndPoint}, reason: {reason}, rommID: {id})");
             }
             else
             {
                 if (logger.Log(LogType.Info))
-                    logger.Info($"Disconnected server player. (username: {player.Username}, reason: {reason}, roomInfo: {info})");
+                    logger.Info($"Disconnected server player. (id: {player.ID}, reason: {reason}, rommID: {id})");
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Closes room
-        /// </summary>
-        public virtual void CloseRoom()
-        {
-            Close();
         }
 
         /// <summary>
@@ -232,9 +223,7 @@ namespace OpenNetworkLibrary.UDP.Gaming
         /// </summary>
         protected override void OnTaskedDatagramReceive(Datagram datagram)
         {
-            IPlayer player = players.Get(datagram.ipEndPoint);
-
-            if (player == null)
+            if (!players.TryGetValue(datagram.ipEndPoint, out TPlayer player))
             {
                 if (datagram.Type == (byte)RequestType.Connect)
                     OnConnectRequest(datagram);
@@ -244,14 +233,14 @@ namespace OpenNetworkLibrary.UDP.Gaming
                 switch (datagram.Type)
                 {
                     default:
-                        DisconnectPlayer(player.Username, (int)DisconnectReasonType.UnknownDatagram);
+                        DisconnectPlayer(player.ID, (int)DisconnectReasonType.UnknownDatagram);
                         break;
                     case (byte)RequestType.Connect:
-                        if (logger.Log(LogType.Trace))
-                            logger.Trace($"Receive second UDP room connect request. (remoteEndPoint: {datagram.ipEndPoint}, roomInfo: {info})");
+                        if (logger.Log(LogType.Debug))
+                            logger.Debug($"Receive second UDP room connect request. (id:{player.ID}, remoteEndPoint: {datagram.ipEndPoint}, roomId: {id})");
                         break;
                     case (byte)RequestType.Disconnect:
-                        DisconnectPlayer(player.Username, (int)DisconnectReasonType.Requested);
+                        DisconnectPlayer(player.ID, (int)DisconnectReasonType.Requested);
                         break;
                 }
             }
@@ -263,9 +252,8 @@ namespace OpenNetworkLibrary.UDP.Gaming
             try
             {
                 var request = new ConnectRequest(datagram);
-                var player = players.Get(request.username);
 
-                if (player == null)
+                if (!players.TryGetValue(request.id, out TPlayer player))
                     return;
 
                 if (player.ConnecToken != request.connectToken)
@@ -273,25 +261,25 @@ namespace OpenNetworkLibrary.UDP.Gaming
                     response = new ConnectedResponse((byte)ConnectRequestResultType.IncorrectToken);
                     Send(response, datagram.ipEndPoint);
 
-                    if (logger.Log(LogType.Info))
-                        logger.Info($"Failed to connect room UDP socket player, incorrect token. (username: {request.username}, remoteEndPoint: {datagram.ipEndPoint}, roomInfo: {info})");
+                    if (logger.Log(LogType.Debug))
+                        logger.Debug($"Failed to connect room UDP socket player, incorrect token. (id: {request.id}, remoteEndPoint: {datagram.ipEndPoint}, roomID: {id})");
                 }
 
                 player.RemoteEndPoint = datagram.ipEndPoint;
-                player.LastActionTime = timer.ElapsedMilliseconds;
+                player.LastActionMS = clock.MS;
                 response = new ConnectedResponse((byte)ConnectRequestResultType.Success);
                 Send(response, datagram.ipEndPoint);
 
                 if (logger.Log(LogType.Info))
-                    logger.Info($"Connected a new room UDP socket player. (username: {request.username}, remoteEndPoint: {datagram.ipEndPoint}, roomInfo: {info})");
+                    logger.Info($"Connected a new room UDP socket player. (id: {request.id}, remoteEndPoint: {datagram.ipEndPoint}, roomID: {id})");
             }
             catch
             {
                 response = new ConnectedResponse((byte)ConnectRequestResultType.BadRequest);
                 Send(response, datagram.ipEndPoint);
 
-                if (logger.Log(LogType.Info))
-                    logger.Info($"Failed to connect room UDP socket player, bad request. (remoteEndPoint: {datagram.ipEndPoint}, roomInfo: {info})");
+                if (logger.Log(LogType.Debug))
+                    logger.Debug($"Failed to connect room UDP socket player, bad request. (remoteEndPoint: {datagram.ipEndPoint}, roomID: {id})");
             }
         }
     }

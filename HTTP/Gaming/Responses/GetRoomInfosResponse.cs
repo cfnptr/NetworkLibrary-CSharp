@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using OpenSharedLibrary.Gaming;
+using OpenSharedLibrary.Gaming.Rooms;
 using System;
 using System.Text;
 
-namespace OpenNetworkLibrary.HTTP.Game.Responses
+namespace OpenNetworkLibrary.HTTP.Gaming.Responses
 {
     /// <summary>
     /// Get room list response container class

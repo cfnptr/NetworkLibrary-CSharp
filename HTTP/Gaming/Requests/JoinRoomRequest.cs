@@ -18,7 +18,7 @@ using System;
 using System.Collections.Specialized;
 using System.Net;
 
-namespace OpenNetworkLibrary.HTTP.Game.Requests
+namespace OpenNetworkLibrary.HTTP.Gaming.Requests
 {
     /// <summary>
     /// Join room request container class
@@ -36,9 +36,9 @@ namespace OpenNetworkLibrary.HTTP.Game.Requests
         public string RequestType => Type;
 
         /// <summary>
-        /// Account username
+        /// Account identifier
         /// </summary>
-        public Username username;
+        public long accountId;
         /// <summary>
         /// Account access token
         /// </summary>
@@ -46,7 +46,7 @@ namespace OpenNetworkLibrary.HTTP.Game.Requests
         /// <summary>
         /// Room unique identifier
         /// </summary>
-        public int roomId;
+        public long roomId;
 
         /// <summary>
         /// Creates a new join room request class instance
@@ -55,9 +55,9 @@ namespace OpenNetworkLibrary.HTTP.Game.Requests
         /// <summary>
         /// Creates a new join room request class instance
         /// </summary>
-        public JoinRoomRequest(Username username, Token accessToken, int roomId)
+        public JoinRoomRequest(long accountId, Token accessToken, long roomId)
         {
-            this.username = username;
+            this.accountId = accountId;
             this.accessToken = accessToken;
             this.roomId = roomId;
         }
@@ -69,9 +69,9 @@ namespace OpenNetworkLibrary.HTTP.Game.Requests
             if (queryString.Count != 3)
                 throw new ArgumentException();
 
-            username = new Username(queryString.Get(0));
+            accountId = long.Parse(queryString.Get(0));
             accessToken = new Token(queryString.Get(1));
-            roomId = int.Parse(queryString.Get(2));
+            roomId = long.Parse(queryString.Get(2));
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace OpenNetworkLibrary.HTTP.Game.Requests
         /// </summary>
         public string ToURL(string address)
         {
-            return $"{address}{Type}?u={username}&t={WebUtility.UrlEncode(accessToken.ToBase64())}&i={roomId}";
+            return $"{address}{Type}?a={accountId}&t={WebUtility.UrlEncode(accessToken.ToBase64())}&r={roomId}";
         }
     }
 }

@@ -24,7 +24,7 @@ namespace OpenNetworkLibrary.HTTP
     /// <summary>
     /// HTTP server class
     /// </summary>
-    public abstract class Server : IServer
+    public abstract class HttpServer : IHttpServer
     {
         /// <summary>
         /// Server logger
@@ -61,7 +61,7 @@ namespace OpenNetworkLibrary.HTTP
         /// <summary>
         /// Creates a new HTTP server class instance
         /// </summary>
-        public Server(ILogger logger, string address)
+        public HttpServer(ILogger logger, string address)
         {
             this.logger = logger ?? throw new ArgumentNullException();
             this.address = address ?? throw new ArgumentNullException();

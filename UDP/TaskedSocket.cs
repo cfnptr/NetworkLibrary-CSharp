@@ -23,7 +23,7 @@ namespace OpenNetworkLibrary.UDP
     /// <summary>
     /// Tasked UDP socket abstract class
     /// </summary>
-    public abstract class TaskedSocket : Socket, ITaskedSocket
+    public abstract class TaskedSocket : UdpSocket, ITaskedSocket
     {
         /// <summary>
         /// Still active task count

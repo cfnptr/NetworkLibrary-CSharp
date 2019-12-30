@@ -21,7 +21,7 @@ namespace OpenNetworkLibrary.UDP
     /// <summary>
     /// Queued UDP socket class (thread-safe)
     /// </summary>
-    public class QueuedSocket : Socket, IQueuedSocket
+    public class QueuedSocket : UdpSocket, IQueuedSocket
     {
         /// <summary>
         /// Maximum datagram count in the queue

@@ -13,19 +13,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using OpenSharedLibrary.Gaming;
-using System.Diagnostics;
+using OpenSharedLibrary.Gaming.Players;
+using OpenSharedLibrary.Gaming.Rooms;
+using OpenSharedLibrary.Timing;
 
 namespace OpenNetworkLibrary.UDP.Gaming
 {
     /// <summary>
     /// Room UDP socket interface
     /// </summary>
-    public interface IRoomSocket : ITaskedSocket, IRoom
+    public interface IRoomSocket<TPlayer, TPlayerFactory> : ITaskedSocket, IRoom
+        where TPlayer : IPlayer
+        where TPlayerFactory : IPlayerFactory<TPlayer>
     {
         /// <summary>
-        /// Room timer
+        /// Room clock
         /// </summary>
-        Stopwatch Timer { get; }
+        IClock Clock { get; }
+        /// <summary>
+        /// Player factory
+        /// </summary>
+        TPlayerFactory PlayerFactory { get; }
+        /// <summary>
+        /// Player database
+        /// </summary>
+        IPlayerDatabase<TPlayer, TPlayerFactory> PlayerDatabase { get; }
+        /// <summary>
+        /// Player concurrent dictionary
+        /// </summary>
+        PlayerDictionary<TPlayer> Players { get; }
     }
 }

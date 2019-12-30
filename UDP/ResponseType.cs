@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace OpenNetworkLibrary.UDP.Gaming.Requests
+namespace OpenNetworkLibrary.UDP
 {
     /// <summary>
-    /// Request type
+    /// Response type
     /// </summary>
-    public enum RequestType : byte
+    public enum ResponseType : byte
     {
-        Connect = 0,
-        Disconnect = 1,
+        Connected = 0,
+        Disconnected = 1,
     }
 }

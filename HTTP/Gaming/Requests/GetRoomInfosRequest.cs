@@ -18,7 +18,7 @@ using System;
 using System.Collections.Specialized;
 using System.Net;
 
-namespace OpenNetworkLibrary.HTTP.Game.Requests
+namespace OpenNetworkLibrary.HTTP.Gaming.Requests
 {
     /// <summary>
     /// Get room infos request container class
@@ -36,9 +36,9 @@ namespace OpenNetworkLibrary.HTTP.Game.Requests
         public string RequestType => Type;
 
         /// <summary>
-        /// Account username
+        /// Account identifier
         /// </summary>
-        public Username username;
+        public long id;
         /// <summary>
         /// Account access token
         /// </summary>
@@ -51,9 +51,9 @@ namespace OpenNetworkLibrary.HTTP.Game.Requests
         /// <summary>
         /// Creates a new get room infos request class instance
         /// </summary>
-        public GetRoomInfosRequest(Username username, Token accessToken)
+        public GetRoomInfosRequest(long id, Token accessToken)
         {
-            this.username = username;
+            this.id = id;
             this.accessToken = accessToken;
         }
         /// <summary>
@@ -64,7 +64,7 @@ namespace OpenNetworkLibrary.HTTP.Game.Requests
             if (queryString.Count != 2)
                 throw new ArgumentException();
 
-            username = new Username(queryString.Get(0));
+            id = long.Parse(queryString.Get(0));
             accessToken = new Token(queryString.Get(1));
         }
 
@@ -73,7 +73,7 @@ namespace OpenNetworkLibrary.HTTP.Game.Requests
         /// </summary>
         public string ToURL(string address)
         {
-            return $"{address}{Type}?u={username}&t={WebUtility.UrlEncode(accessToken.ToBase64())}";
+            return $"{address}{Type}?i={id}&t={WebUtility.UrlEncode(accessToken.ToBase64())}";
         }
     }
 }
