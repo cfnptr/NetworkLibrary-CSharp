@@ -11,9 +11,9 @@ using System;
 namespace InjectorGames.NetworkLibrary.UDP.Gaming
 {
     /// <summary>
-    /// Room UDP sockcet class
+    /// Room UDP socket class
     /// </summary>
-    public class RoomSocket<TPlayer, TPlayerFactory> : TaskedUdpSocket, IRoomSocket<TPlayer, TPlayerFactory>
+    public class RoomUdpSocket<TPlayer, TPlayerFactory> : TaskedUdpSocket, IRoomUdpSocket<TPlayer, TPlayerFactory>
         where TPlayer : IPlayer
         where TPlayerFactory : IPlayerFactory<TPlayer>
     {
@@ -97,7 +97,7 @@ namespace InjectorGames.NetworkLibrary.UDP.Gaming
         /// <summary>
         /// Creates a new room UDP socket class instance
         /// </summary>
-        public RoomSocket(long id, string name, int maxPlayerCount, IClock clock, TPlayerFactory playerFactory, IPlayerDatabase<TPlayer, TPlayerFactory> playerDatabase, PlayerDictionary<TPlayer> players, int maxTaskCount, ILogger logger) : base(maxTaskCount, logger)
+        public RoomUdpSocket(long id, string name, int maxPlayerCount, IClock clock, TPlayerFactory playerFactory, IPlayerDatabase<TPlayer, TPlayerFactory> playerDatabase, PlayerDictionary<TPlayer> players, int maxTaskCount, ILogger logger) : base(maxTaskCount, logger)
         {
             this.id = id;
 

@@ -7,7 +7,7 @@ namespace InjectorGames.NetworkLibrary.UDP.Gaming
     /// <summary>
     /// Room UDP socket interface
     /// </summary>
-    public interface IRoomSocket<TPlayer, TPlayerFactory> : ITaskedUdpSocket, IRoom
+    public interface IRoomUdpSocket<TPlayer, TPlayerFactory> : ITaskedUdpSocket, IRoom
         where TPlayer : IPlayer
         where TPlayerFactory : IPlayerFactory<TPlayer>
     {
