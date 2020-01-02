@@ -4,6 +4,12 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <Authors>Nikita Fediuchin</Authors>
+
+    <Company>Injector Games</Company>
+
+    <RootNamespace>InjectorGames.NetworkLibrary</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

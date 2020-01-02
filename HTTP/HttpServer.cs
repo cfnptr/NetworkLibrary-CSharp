@@ -1,25 +1,10 @@
-﻿
-// Copyright 2019 Nikita Fediuchin (QuantumBranch)
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-using OpenSharedLibrary.Logging;
+﻿using InjectorGames.SharedLibrary.Logs;
 using System;
 using System.Net;
 using System.Text;
 using System.Threading;
 
-namespace OpenNetworkLibrary.HTTP
+namespace InjectorGames.NetworkLibrary.HTTP
 {
     /// <summary>
     /// HTTP server class
@@ -82,7 +67,7 @@ namespace OpenNetworkLibrary.HTTP
 
                 return;
             }
-                
+
 
             listener.Start();
             requestThread.Start();
@@ -154,7 +139,7 @@ namespace OpenNetworkLibrary.HTTP
         /// </summary>
         protected virtual void OnRequestThreadException(Exception exception)
         {
-            if(exception is HttpListenerException)
+            if (exception is HttpListenerException)
             {
                 if (logger.Log(LogType.Trace))
                     logger.Trace($"Ignored HTTP server request thread listener exception. {exception}");
@@ -193,13 +178,13 @@ namespace OpenNetworkLibrary.HTTP
             var output = httpResponse.OutputStream;
             output.Write(buffer, 0, buffer.Length);
 
-            if(close)
+            if (close)
                 output.Close();
         }
         /// <summary>
         /// Sends HTTP server response to the client
         /// </summary>
-        public static void SendResponse(HttpListenerResponse httpResponse, IResponse response)
+        public static void SendResponse(HttpListenerResponse httpResponse, IHttpResponse response)
         {
             SendResponse(httpResponse, response.ToBody(), true);
         }

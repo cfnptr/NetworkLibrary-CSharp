@@ -1,27 +1,12 @@
-﻿
-// Copyright 2019 Nikita Fediuchin (QuantumBranch)
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-using OpenSharedLibrary.Logging;
+﻿using InjectorGames.SharedLibrary.Logs;
 using System.Collections.Generic;
 
-namespace OpenNetworkLibrary.UDP
+namespace InjectorGames.NetworkLibrary.UDP
 {
     /// <summary>
     /// Queued UDP socket class (thread-safe)
     /// </summary>
-    public class QueuedSocket : UdpSocket, IQueuedSocket
+    public class QueuedUdpSocket : UdpSocket, IQueuedUdpSocket
     {
         /// <summary>
         /// Maximum datagram count in the queue
@@ -40,7 +25,7 @@ namespace OpenNetworkLibrary.UDP
         /// <summary>
         /// Creates a new queued UDP socket abstract class instance
         /// </summary>
-        public QueuedSocket(ILogger logger, int maxDatagramCount) : base(logger)
+        public QueuedUdpSocket(ILogger logger, int maxDatagramCount) : base(logger)
         {
             this.maxDatagramCount = maxDatagramCount;
 
@@ -89,7 +74,7 @@ namespace OpenNetworkLibrary.UDP
         {
             lock (locker)
             {
-                if(datagrams.Count < maxDatagramCount)
+                if (datagrams.Count < maxDatagramCount)
                 {
                     datagrams.Enqueue(datagram);
 
@@ -100,8 +85,8 @@ namespace OpenNetworkLibrary.UDP
                 {
                     if (logger.Log(LogType.Trace))
                         logger.Trace($"Failed to enqueued UDP socket datagram, queue is full. (remoteEndPoint: {datagram.ipEndPoint}, length: {datagram.Length}, type: {datagram.Type}))");
-                }   
-            } 
+                }
+            }
         }
     }
 }

@@ -1,25 +1,10 @@
-﻿
-// Copyright 2019 Nikita Fediuchin (QuantumBranch)
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-using OpenSharedLibrary.Logging;
+﻿using InjectorGames.SharedLibrary.Logs;
 using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace OpenNetworkLibrary.UDP
+namespace InjectorGames.NetworkLibrary.UDP
 {
     /// <summary>
     /// UDP socket abstract class
@@ -188,7 +173,7 @@ namespace OpenNetworkLibrary.UDP
         /// <summary>
         /// Sends datagram to the specified remote end point
         /// </summary>
-        public int Send(IRequestResponse requestResponse, IPEndPoint remoteEndPoint)
+        public int Send(IUdpRequestResponse requestResponse, IPEndPoint remoteEndPoint)
         {
             var data = requestResponse.ToData();
             var result = socket.SendTo(data, 0, data.Length, SocketFlags.None, remoteEndPoint);
@@ -254,7 +239,7 @@ namespace OpenNetworkLibrary.UDP
         {
             if (exception is SocketException)
             {
-                if(logger.Log(LogType.Trace))
+                if (logger.Log(LogType.Trace))
                     logger.Trace($"Ignored UDP socket receive thread exception. {exception}");
             }
             else
@@ -263,7 +248,7 @@ namespace OpenNetworkLibrary.UDP
                     logger.Fatal($"UDP socket request thread exception. {exception}");
 
                 Close();
-            } 
+            }
         }
 
         /// <summary>

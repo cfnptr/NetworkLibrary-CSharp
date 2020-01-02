@@ -1,37 +1,22 @@
-﻿
-// Copyright 2019 Nikita Fediuchin (QuantumBranch)
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-using OpenNetworkLibrary.HTTP.Authorization;
-using OpenNetworkLibrary.HTTP.Authorization.Requests;
-using OpenNetworkLibrary.HTTP.Authorization.Responses;
-using OpenNetworkLibrary.HTTP.Gaming.Requests;
-using OpenNetworkLibrary.HTTP.Gaming.Responses;
-using OpenSharedLibrary.Credentials;
-using OpenSharedLibrary.Credentials.Accounts;
-using OpenSharedLibrary.Gaming.Rooms;
-using OpenSharedLibrary.Logging;
+﻿using InjectorGames.NetworkLibrary.HTTP.Authorization;
+using InjectorGames.NetworkLibrary.HTTP.Authorization.Requests;
+using InjectorGames.NetworkLibrary.HTTP.Authorization.Responses;
+using InjectorGames.NetworkLibrary.HTTP.Gaming.Requests;
+using InjectorGames.NetworkLibrary.HTTP.Gaming.Responses;
+using InjectorGames.SharedLibrary.Credentials;
+using InjectorGames.SharedLibrary.Credentials.Accounts;
+using InjectorGames.SharedLibrary.Games.Rooms;
+using InjectorGames.SharedLibrary.Logs;
 using System;
 using System.Collections.Specialized;
 using System.Net;
 
-namespace OpenNetworkLibrary.HTTP.Gaming
+namespace InjectorGames.NetworkLibrary.HTTP.Gaming
 {
     /// <summary>
     /// Room HTTP server class
     /// </summary>
-    public class RoomServer<TRoom, TAccount,TAccountFactory> : AuthServer<TAccount, TAccountFactory>, IRoomServer<TRoom, TAccount, TAccountFactory>
+    public class RoomHttpServer<TRoom, TAccount, TAccountFactory> : AuthHttpServer<TAccount, TAccountFactory>, IRoomHttpServer<TRoom, TAccount, TAccountFactory>
         where TRoom : IRoom
         where TAccount : IAccount
         where TAccountFactory : IAccountFactory<TAccount>
@@ -49,7 +34,7 @@ namespace OpenNetworkLibrary.HTTP.Gaming
         /// <summary>
         /// Creates a new room HTTP server class instance
         /// </summary>
-        public RoomServer(Version version, RoomDictionary<TRoom, TAccount> rooms, TAccountFactory accountFactory, IAccountDatabase<TAccount, TAccountFactory> accountDatabase, ILogger logger, string address) : base(version, accountFactory, accountDatabase, logger, address)
+        public RoomHttpServer(Version version, RoomDictionary<TRoom, TAccount> rooms, TAccountFactory accountFactory, IAccountDatabase<TAccount, TAccountFactory> accountDatabase, ILogger logger, string address) : base(version, accountFactory, accountDatabase, logger, address)
         {
             this.rooms = rooms ?? throw new ArgumentNullException();
             listener.Prefixes.Add($"{address}{GetRoomInfosRequest.Type}/");
@@ -88,7 +73,7 @@ namespace OpenNetworkLibrary.HTTP.Gaming
         }
         protected void OnGetRoomInfosRequest(NameValueCollection queryString, HttpListenerRequest httpRequest, HttpListenerResponse httpResponse)
         {
-            IResponse response;
+            IHttpResponse response;
 
             try
             {
@@ -135,7 +120,7 @@ namespace OpenNetworkLibrary.HTTP.Gaming
         }
         protected void OnJoinRoomRequest(NameValueCollection queryString, HttpListenerRequest httpRequest, HttpListenerResponse httpResponse)
         {
-            IResponse response;
+            IHttpResponse response;
 
             try
             {

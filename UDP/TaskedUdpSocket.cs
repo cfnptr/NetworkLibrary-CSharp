@@ -1,29 +1,14 @@
-﻿
-// Copyright 2019 Nikita Fediuchin (QuantumBranch)
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-using OpenSharedLibrary.Logging;
+﻿using InjectorGames.SharedLibrary.Logs;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenNetworkLibrary.UDP
+namespace InjectorGames.NetworkLibrary.UDP
 {
     /// <summary>
     /// Tasked UDP socket abstract class
     /// </summary>
-    public abstract class TaskedSocket : UdpSocket, ITaskedSocket
+    public abstract class TaskedUdpSocket : UdpSocket, ITaskedUdpSocket
     {
         /// <summary>
         /// Still active task count
@@ -42,7 +27,7 @@ namespace OpenNetworkLibrary.UDP
         /// <summary>
         /// Creates a new tasked UDP socket abstract class instance
         /// </summary>
-        public TaskedSocket(int maxTaskCount, ILogger logger) : base(logger)
+        public TaskedUdpSocket(int maxTaskCount, ILogger logger) : base(logger)
         {
             taskCount = 0;
             this.maxTaskCount = maxTaskCount;

@@ -1,0 +1,3 @@
+[submodule "Libraries/SharedLibrary-CSharp"]
+	path = Libraries/SharedLibrary-CSharp
+	url = https://github.com/QuantumBranch/SharedLibrary-CSharp

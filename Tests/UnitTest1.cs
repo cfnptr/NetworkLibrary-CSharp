@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NetworkLibrary
+namespace InjectorGames.NetworkLibrary.Test
 {
     [TestClass]
     public class UnitTest1
