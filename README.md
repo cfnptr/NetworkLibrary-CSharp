@@ -1,1 +1,1 @@
-An open source library for developing network applications and games.
+# Moved [here](https://github.com/InjectorGames/NetworkLibrary-CSharp)
