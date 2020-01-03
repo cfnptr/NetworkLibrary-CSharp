@@ -3,7 +3,7 @@
     /// <summary>
     /// Sign up HTTP response class
     /// </summary>
-    public class SignUpHttpResponse : IHttpResponse
+    public class SignUpHttpResponse : BaseHttpResponse
     {
         /// <summary>
         /// Response type string value
@@ -13,7 +13,7 @@
         /// <summary>
         /// Response type string value
         /// </summary>
-        public string ResponseType => Type;
+        public override string ResponseType => Type;
 
         /// <summary>
         /// Sign up request result
@@ -49,7 +49,7 @@
         /// <summary>
         /// Returns HTTP response body
         /// </summary>
-        public string ToBody()
+        public override string ToBody()
         {
             return $"{Type}\n{result}";
         }
@@ -59,8 +59,8 @@
         /// </summary>
         public enum ResultType : int
         {
-            BadRequest = HttpResponseResultType.BadRequest,
-            Success = HttpResponseResultType.Success,
+            BadRequest = BaseResultType.BadRequest,
+            Success = BaseResultType.Success,
 
             UsernameBusy,
             FailedToWrite,

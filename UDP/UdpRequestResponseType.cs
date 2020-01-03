@@ -3,9 +3,10 @@
     /// <summary>
     /// UDP request type
     /// </summary>
-    public enum UdpRequestType : byte
+    public enum UdpRequestResponseType : byte
     {
-        Connect = 0,
-        Disconnect = 1,
+        Connect,
+        Disconnect,
+        Count,
     }
 }

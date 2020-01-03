@@ -6,7 +6,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization.Responses
     /// <summary>
     /// Sign in HTTP response class
     /// </summary>
-    public class SignInHttpResponse : IHttpResponse
+    public class SignInHttpResponse : BaseHttpResponse
     {
         /// <summary>
         /// Response type string value
@@ -16,7 +16,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization.Responses
         /// <summary>
         /// Response type string value
         /// </summary>
-        public string ResponseType => Type;
+        public override string ResponseType => Type;
 
         /// <summary>
         /// Sign in request result
@@ -79,7 +79,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization.Responses
         /// <summary>
         /// Returns HTTP response body
         /// </summary>
-        public string ToBody()
+        public override string ToBody()
         {
             if (accessToken != null)
                 return $"{Type}\n{result} {version} {accessToken.ToBase64()}";
@@ -92,8 +92,8 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization.Responses
         /// </summary>
         public enum ResultType : int
         {
-            BadRequest = HttpResponseResultType.BadRequest,
-            Success = HttpResponseResultType.Success,
+            BadRequest = BaseResultType.BadRequest,
+            Success = BaseResultType.Success,
 
             IncorrectUsername,
             IncorrectPassword,

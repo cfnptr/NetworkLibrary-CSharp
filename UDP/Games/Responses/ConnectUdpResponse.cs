@@ -6,7 +6,7 @@ namespace InjectorGames.NetworkLibrary.UDP.Games.Responses
     /// <summary>
     /// Connect UDP response class
     /// </summary>
-    public class ConnectUdpResponse : IUdpRequestResponse
+    public class ConnectUdpResponse : BaseUdpRequestResponse
     {
         /// <summary>
         /// Response byte size of the datagram data array
@@ -16,7 +16,7 @@ namespace InjectorGames.NetworkLibrary.UDP.Games.Responses
         /// <summary>
         /// Response byte size of the datagram data array
         /// </summary>
-        public int DataByteSize => ByteSize;
+        public override int DataByteSize => ByteSize;
 
         /// <summary>
         /// Connect request result
@@ -62,13 +62,13 @@ namespace InjectorGames.NetworkLibrary.UDP.Games.Responses
         /// <summary>
         /// Converts UDP response to the datagram data
         /// </summary>
-        public byte[] ToData()
+        public override byte[] ToData()
         {
             var data = new byte[ByteSize];
 
             using (var binaryWriter = new BinaryWriter(new MemoryStream(data)))
             {
-                binaryWriter.Write((byte)UdpResponseType.Connected);
+                binaryWriter.Write((byte)UdpRequestResponseType.Connect);
                 binaryWriter.Write(result);
                 return data;
             }

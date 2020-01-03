@@ -7,7 +7,7 @@ namespace InjectorGames.NetworkLibrary.UDP.Games.Requests
     /// <summary>
     /// Connect UDP request class
     /// </summary>
-    public class ConnectUdpRequest : IUdpRequestResponse
+    public class ConnectUdpRequest : BaseUdpRequestResponse
     {
         /// <summary>
         /// Request byte size of the datagram data array
@@ -17,7 +17,7 @@ namespace InjectorGames.NetworkLibrary.UDP.Games.Requests
         /// <summary>
         /// Request byte size of the datagram data array
         /// </summary>
-        public int DataByteSize => ByteSize;
+        public override int DataByteSize => ByteSize;
 
         /// <summary>
         /// Player identifier
@@ -63,13 +63,13 @@ namespace InjectorGames.NetworkLibrary.UDP.Games.Requests
         /// <summary>
         /// Converts UDP request to the datagram data
         /// </summary>
-        public byte[] ToData()
+        public override byte[] ToData()
         {
             var data = new byte[DataByteSize];
 
             using (var binaryWriter = new BinaryWriter(new MemoryStream(data)))
             {
-                binaryWriter.Write((byte)UdpRequestType.Connect);
+                binaryWriter.Write((byte)UdpRequestResponseType.Connect);
                 binaryWriter.Write(id);
                 connectToken.ToBytes(binaryWriter);
                 return data;

@@ -6,7 +6,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Games.Responses
     /// <summary>
     /// Join room HTTP response class
     /// </summary> 
-    public class JoinRoomHttpResponse : IHttpResponse
+    public class JoinRoomHttpResponse : BaseHttpResponse
     {
         /// <summary>
         /// Response type string value
@@ -16,7 +16,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Games.Responses
         /// <summary>
         /// Response type string value
         /// </summary>
-        public string ResponseType => Type;
+        public override string ResponseType => Type;
 
         /// <summary>
         /// Join room request result
@@ -72,7 +72,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Games.Responses
         /// <summary>
         /// Returns HTTP response body
         /// </summary>
-        public string ToBody()
+        public override string ToBody()
         {
             if (connectToken != null)
                 return $"{Type}\n{result} {connectToken.ToBase64()}";
@@ -85,8 +85,8 @@ namespace InjectorGames.NetworkLibrary.HTTP.Games.Responses
         /// </summary>
         public enum ResultType
         {
-            BadRequest = HttpResponseResultType.BadRequest,
-            Success = HttpResponseResultType.Success,
+            BadRequest = BaseResultType.BadRequest,
+            Success = BaseResultType.Success,
 
             IncorrectUsername,
             IncorrectAccessToken,

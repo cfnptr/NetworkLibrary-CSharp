@@ -8,7 +8,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization.Requests
     /// <summary>
     /// Sign up HTTP request class
     /// </summary>
-    public class SignUpHttpRequest : IHttpRequest
+    public class SignUpHttpRequest : BaseHttpRequest
     {
         /// <summary>
         /// Request type string value
@@ -18,7 +18,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization.Requests
         /// <summary>
         /// Request type string value
         /// </summary>
-        public string RequestType => Type;
+        public override string RequestType => Type;
 
         /// <summary>
         /// Account name
@@ -62,7 +62,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization.Requests
         /// <summary>
         /// Returns HTTP request URL
         /// </summary>
-        public string ToURL(string address)
+        public override string ToURL(string address)
         {
             return $"{address}{Type}?n={name}&p={WebUtility.UrlEncode(passhash.ToBase64())}&e={WebUtility.UrlEncode(emailAddress)}";
         }

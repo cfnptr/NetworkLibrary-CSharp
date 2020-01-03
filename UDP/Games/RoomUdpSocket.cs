@@ -217,7 +217,7 @@ namespace InjectorGames.NetworkLibrary.UDP.Games
         {
             if (!players.TryGetValue(datagram.ipEndPoint, out TPlayer player))
             {
-                if (datagram.Type == (byte)UdpRequestType.Connect)
+                if (datagram.Type == (byte)UdpRequestResponseType.Connect)
                     OnConnectRequest(datagram);
             }
             else
@@ -227,11 +227,11 @@ namespace InjectorGames.NetworkLibrary.UDP.Games
                     default:
                         DisconnectPlayer(player.ID, DisconnectUdpResponse.ReasonType.UnknownDatagram);
                         break;
-                    case (byte)UdpRequestType.Connect:
+                    case (byte)UdpRequestResponseType.Connect:
                         if (logger.Log(LogType.Debug))
                             logger.Debug($"Receive second UDP room connect request. (id:{player.ID}, remoteEndPoint: {datagram.ipEndPoint}, roomId: {id})");
                         break;
-                    case (byte)UdpRequestType.Disconnect:
+                    case (byte)UdpRequestResponseType.Disconnect:
                         DisconnectPlayer(player.ID, DisconnectUdpResponse.ReasonType.Requested);
                         break;
                 }

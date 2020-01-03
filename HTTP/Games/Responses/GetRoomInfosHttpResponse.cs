@@ -7,7 +7,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Games.Responses
     /// <summary>
     /// Get room infos HTTP response class
     /// </summary>
-    public class GetRoomInfosHttpResponse : IHttpResponse
+    public class GetRoomInfosHttpResponse : BaseHttpResponse
     {
         /// <summary>
         /// Response type string value
@@ -17,7 +17,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Games.Responses
         /// <summary>
         /// Response type string value
         /// </summary>
-        public string ResponseType => Type;
+        public override string ResponseType => Type;
 
         /// <summary>
         /// Get room infos request result
@@ -74,7 +74,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Games.Responses
         /// <summary>
         /// Returns HTTP server response body
         /// </summary>
-        public string ToBody()
+        public override string ToBody()
         {
             if (roomInfos != null && roomInfos.Length > 0)
             {
@@ -104,8 +104,8 @@ namespace InjectorGames.NetworkLibrary.HTTP.Games.Responses
         /// </summary>
         public enum ResultType
         {
-            BadRequest = HttpResponseResultType.BadRequest,
-            Success = HttpResponseResultType.Success,
+            BadRequest = BaseResultType.BadRequest,
+            Success = BaseResultType.Success,
 
             IncorrectUsername,
             IncorrectAccessToken,

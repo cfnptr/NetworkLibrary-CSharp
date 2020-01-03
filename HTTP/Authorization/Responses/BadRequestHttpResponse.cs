@@ -3,7 +3,7 @@
     /// <summary>
     /// Bad request HTTP response class
     /// </summary>
-    public class BadRequestHttpResponse : IHttpResponse
+    public class BadRequestHttpResponse : BaseHttpResponse
     {
         /// <summary>
         /// Response type string value
@@ -13,7 +13,7 @@
         /// <summary>
         /// Response type string value
         /// </summary>
-        public string ResponseType => Type;
+        public override string ResponseType => Type;
 
         /// <summary>
         /// Bad request details
@@ -35,7 +35,7 @@
         /// <summary>
         /// Returns HTTP response body
         /// </summary>
-        public string ToBody()
+        public override string ToBody()
         {
             return $"{Type}\n{details}";
         }

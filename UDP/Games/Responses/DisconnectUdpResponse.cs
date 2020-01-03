@@ -6,7 +6,7 @@ namespace InjectorGames.NetworkLibrary.UDP.Games.Responses
     /// <summary>
     /// Disconnect UDP response class
     /// </summary>
-    public class DisconnectUdpResponse : IUdpRequestResponse
+    public class DisconnectUdpResponse : BaseUdpRequestResponse
     {
         /// <summary>
         /// Response byte size of the datagram data array
@@ -16,7 +16,7 @@ namespace InjectorGames.NetworkLibrary.UDP.Games.Responses
         /// <summary>
         /// Response byte size of the datagram data array
         /// </summary>
-        public int DataByteSize => ByteSize;
+        public override int DataByteSize => ByteSize;
 
         /// <summary>
         /// Disconnect response reason type
@@ -61,13 +61,13 @@ namespace InjectorGames.NetworkLibrary.UDP.Games.Responses
         /// <summary>
         /// Converts UDP response to the datagram data
         /// </summary>
-        public byte[] ToData()
+        public override byte[] ToData()
         {
             var data = new byte[DataByteSize];
 
             using (var binaryWriter = new BinaryWriter(new MemoryStream(data)))
             {
-                binaryWriter.Write((byte)UdpResponseType.Disconnected);
+                binaryWriter.Write((byte)UdpRequestResponseType.Disconnect);
                 binaryWriter.Write(reason);
                 return data;
             }

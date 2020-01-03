@@ -8,7 +8,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Games.Requests
     /// <summary>
     /// Join room HTTP request class
     /// </summary>
-    public class JoinRoomHttpRequest : IHttpRequest
+    public class JoinRoomHttpRequest : BaseHttpRequest
     {
         /// <summary>
         /// Request type string value
@@ -18,7 +18,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Games.Requests
         /// <summary>
         /// Request type string value
         /// </summary>
-        public string RequestType => Type;
+        public override string RequestType => Type;
 
         /// <summary>
         /// Account identifier
@@ -62,7 +62,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Games.Requests
         /// <summary>
         /// Returns HTTP request URL
         /// </summary>
-        public string ToURL(string address)
+        public override string ToURL(string address)
         {
             return $"{address}{Type}?a={accountId}&t={WebUtility.UrlEncode(accessToken.ToBase64())}&r={roomId}";
         }
