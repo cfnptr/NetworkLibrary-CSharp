@@ -50,8 +50,8 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization
             this.version = version ?? throw new ArgumentNullException();
             this.accountFactory = accountFactory ?? throw new ArgumentNullException();
             this.accountDatabase = accountDatabase ?? throw new ArgumentNullException();
-            listener.Prefixes.Add($"{address}{SignUpRequest.Type}/");
-            listener.Prefixes.Add($"{address}{SignInRequest.Type}/");
+            listener.Prefixes.Add($"{address}{SignUpHttpRequest.Type}/");
+            listener.Prefixes.Add($"{address}{SignInHttpRequest.Type}/");
         }
 
         /// <summary>
@@ -67,13 +67,13 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization
             switch (urlPair[0])
             {
                 default:
-                    var response = new BadRequestResponse("Unknown request type");
+                    var response = new BadRequestHttpResponse("Unknown request type");
                     SendResponse(httpResponse, response);
                     break;
-                case SignUpRequest.Type:
+                case SignUpHttpRequest.Type:
                     OnSignUpRequest(queryString, httpRequest, httpResponse);
                     break;
-                case SignInRequest.Type:
+                case SignInHttpRequest.Type:
                     OnSignInRequest(queryString, httpRequest, httpResponse);
                     break;
             }
@@ -84,11 +84,11 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization
 
             try
             {
-                var request = new SignUpRequest(queryString);
+                var request = new SignUpHttpRequest(queryString);
 
                 if (accountDatabase.ContainsKey(request.name))
                 {
-                    response = new SignUpResponse((int)SignUpResultType.UsernameBusy);
+                    response = new SignUpHttpResponse(SignUpHttpResponse.ResultType.UsernameBusy);
                     SendResponse(htppResponse, response);
 
                     if (logger.Log(LogType.Trace))
@@ -101,7 +101,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization
 
                 if (!accountDatabase.TryAdd(accountData))
                 {
-                    response = new SignUpResponse((int)SignUpResultType.FailedToWrite);
+                    response = new SignUpHttpResponse(SignUpHttpResponse.ResultType.FailedToWrite);
                     SendResponse(htppResponse, response);
 
                     if (logger.Log(LogType.Error))
@@ -110,7 +110,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization
                     return;
                 }
 
-                response = new SignUpResponse((int)SignUpResultType.Success);
+                response = new SignUpHttpResponse(SignUpHttpResponse.ResultType.Success);
                 SendResponse(htppResponse, response);
 
                 if (logger.Log(LogType.Info))
@@ -118,7 +118,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization
             }
             catch
             {
-                response = new SignUpResponse((int)SignUpResultType.BadRequest);
+                response = new SignUpHttpResponse(SignUpHttpResponse.ResultType.BadRequest);
                 SendResponse(htppResponse, response);
 
                 if (logger.Log(LogType.Trace))
@@ -131,11 +131,11 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization
 
             try
             {
-                var request = new SignUpRequest(queryString);
+                var request = new SignUpHttpRequest(queryString);
 
                 if (!accountDatabase.TryGetValue(request.name, accountFactory, out TAccount account))
                 {
-                    response = new SignInResponse((int)SignInResultType.IncorrectUsername);
+                    response = new SignInHttpResponse(SignInHttpResponse.ResultType.IncorrectUsername);
                     SendResponse(httpResponse, response);
 
                     if (logger.Log(LogType.Trace))
@@ -146,7 +146,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization
 
                 if (request.passhash != account.Passhash)
                 {
-                    response = new SignInResponse((int)SignInResultType.IncorrectPassword);
+                    response = new SignInHttpResponse(SignInHttpResponse.ResultType.IncorrectPassword);
                     SendResponse(httpResponse, response);
 
                     if (logger.Log(LogType.Trace))
@@ -157,7 +157,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization
 
                 if (account.IsBlocked)
                 {
-                    response = new SignInResponse((int)SignInResultType.AccountIsBlocked);
+                    response = new SignInHttpResponse(SignInHttpResponse.ResultType.AccountIsBlocked);
                     SendResponse(httpResponse, response);
 
                     if (logger.Log(LogType.Trace))
@@ -172,7 +172,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization
 
                 if (!accountDatabase.TryUpdate(account))
                 {
-                    response = new SignInResponse((int)SignInResultType.FailedToWrite);
+                    response = new SignInHttpResponse(SignInHttpResponse.ResultType.FailedToWrite);
                     SendResponse(httpResponse, response);
 
                     if (logger.Log(LogType.Error))
@@ -181,7 +181,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization
                     return;
                 }
 
-                response = new SignInResponse((int)SignInResultType.Success, version, accessToken);
+                response = new SignInHttpResponse(SignInHttpResponse.ResultType.Success, version, accessToken);
                 SendResponse(httpResponse, response);
 
                 if (logger.Log(LogType.Info))
@@ -189,7 +189,7 @@ namespace InjectorGames.NetworkLibrary.HTTP.Authorization
             }
             catch
             {
-                response = new SignInResponse((int)SignInResultType.BadRequest);
+                response = new SignInHttpResponse(SignInHttpResponse.ResultType.BadRequest);
                 SendResponse(httpResponse, response);
 
                 if (logger.Log(LogType.Trace))
