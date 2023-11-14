@@ -1,1 +1,1 @@
-# Moved [here](https://github.com/InjectorGames/NetworkLibrary-CSharp)
+# Successor ----> [Nets](https://github.com/cfnptr/nets)
